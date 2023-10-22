@@ -19,12 +19,12 @@ services:
         FLINK_PROPERTIES=
         jobmanager.rpc.address: jobmanager
         taskmanager.numberOfTaskSlots: 2
+    links:
+      - db:db
   db:
     image: mysql:5.7
     platform: linux/x86_64
     restart: always
-    logging:
-      driver: none
     environment:
       MYSQL_DATABASE: 'db'
       # So you don't have to use root, but you can if you like
