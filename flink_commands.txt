@@ -1,0 +1,5 @@
+./bin/flink run \
+      --jobmanager localhost:8081 \
+      -pyclientexec /usr/bin/python3 \
+      -pyexec /usr/bin/python3 \
+      -py examples/python/table/word_count.py
