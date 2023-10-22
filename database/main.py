@@ -12,7 +12,7 @@ def process():
     mycursor = mydb.cursor()
 
     sql = """
-        INSERT INTO customers (CustomerID, LastName, FirstName, Address, City) 
+        INSERT INTO customers_test (CustomerID, LastName, FirstName, Address, City) 
         VALUES (%s, %s, %s, %s, %s)
     """
     val = [
