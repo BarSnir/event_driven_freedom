@@ -1,0 +1,123 @@
+{
+    "tables": [
+        {
+            "name": "Vehicles",
+            "columns": [
+                "VehicleId INT AUTO_INCREMENT PRIMARY KEY,",
+                "KM INT,",
+                "PrevOwnerNumber TINYINT,",
+                "OrderId INT,",
+                "MarketInfoId INT,",
+                "MediaTypeId INT,",
+                "YearOnRoad INT,",
+                "TestDate DATE,",
+                "ImproveId INT"
+            ]
+        },
+        {
+            "name": "MarketInfo",
+            "columns": [
+                "MarketInfoId INT AUTO_INCREMENT PRIMARY KEY,",
+                "AirBags TINYINT,",
+                "SunRoof TINYINT(1),",
+                "MegnesumeWheels TINYINT(1),",
+                "ReversSensors TINYINT(1),",
+                "ABS TINYINT(1),",
+                "Hybrid TINYINT(1),",
+                "Doors TINYINT(1),",
+                "EnvironmentFriendlyLevel TINYINT,",
+                "SecuirtyTestLevel TINYINT,",
+                "ManufacturerId INT,",
+                "ManufacturerText VARCHAR(255),",
+                "ModelId INT,",
+                "ModelText VARCHAR(255),",
+                "SubModelId INT,",
+                "SubModelText VARCHAR(255),",
+                "Year INT,",
+                "HorsePower INT,",
+                "CruseControl TINYINT(1),",
+                "PowerWheel TINYINT(1),",
+                "FullyAutonomic TINYINT(1),",
+                "MarketPrice INT"
+            ]
+        },
+        {
+            "name": "Orders",
+            "columns": [
+                "OrderId INT AUTO_INCREMENT PRIMARY KEY,",
+                "SiteToken TINYINT,",
+                "Price INT,",
+                "StatusId TINYINT,",
+                "CustomerId INT"
+            ]
+        },
+        {
+            "name": "Statuses",
+            "columns": [
+                "StatusId INT AUTO_INCREMENT PRIMARY KEY,",
+                "StatusText VARCHAR(255),",
+                "PackageId TINYINT,",
+                "PackageText VARCHAR(255)"
+            ]
+        },
+        {
+            "name": "MediaType",
+            "columns": [
+                "MediaTypeId INT AUTO_INCREMENT PRIMARY KEY,",
+                "WithGooglePlay TINYINT(1),",
+                "WithApplePlay TINYINT(1),",
+                "AvailableDiskSlot TINYINT(1),",
+                "AvailableUsbSlots TINYINT(1),",
+                "UsbSlotType VARCHAR(255),",
+                "WithDisplay VARCHAR(255),",
+                "TouchDisplay TINYINT(1)"
+            ]
+        },
+        {
+            "name": "Improves",
+            "columns": [
+                "ImproveId INT AUTO_INCREMENT PRIMARY KEY,",
+                "StageLevel TINYINT(1),",
+                "StageText VARCHAR(255),",
+                "PartsImprovedList JSON"
+            ]
+        },
+        {
+            "name": "Images",
+            "columns": [
+                "ImageId INT AUTO_INCREMENT PRIMARY KEY,",
+                "OrderId INT,",
+                "Priority TINYINT,",
+                "Url VARCHAR(255)"
+            ]
+        },
+        {
+            "name": "AuthTypes",
+            "columns": [
+                "AuthTypeId INT AUTO_INCREMENT PRIMARY KEY,",
+                "AuthByGoogle TINYINT(1),",
+                "AuthByApple TINYINT(1),",
+                "AuthByFacebook TINYINT(1),",
+                "AuthByTwitter TINYINT(1)"
+            ]
+        },
+        {
+            "name": "Customers",
+            "columns": [
+                "CustomerId INT AUTO_INCREMENT PRIMARY KEY,",
+                "FirstName VARCHAR(255),",
+                "LastName VARCHAR(255),",
+                "Password VARCHAR(255),",
+                "Email VARCHAR(255),",
+                "CustomerTypeId TINYINT,",
+                "CustomerTypeText VARCHAR(255),",
+                "JoinDate DATETIME,",
+                "ProfileImage VARCHAR(255),",
+                "IsSuspended TINYINT(1),",
+                "SuspendedReasonId TINYINT,",
+                "SuspendedReasonText VARCHAR(255),",
+                "AuthTypeId TINYINT"
+            ]
+        }
+    ]
+}
