@@ -8,9 +8,6 @@ def process():
         database="db"
     )
     mycursor = mydb.cursor()
-
-    mycursor = mydb.cursor()
-
     sql = """
         INSERT INTO customers_test (CustomerID, LastName, FirstName, Address, City) 
         VALUES (%s, %s, %s, %s, %s)
