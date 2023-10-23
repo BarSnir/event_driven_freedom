@@ -1,6 +1,6 @@
 import argparse, sys, os, logging
 from pyflink.table import EnvironmentSettings, TableEnvironment
-from pyflink.table import expressions as F 
+from pyflink.table import expressions as F
 
 def get_jars_path():
     path = os.getcwd()
@@ -40,9 +40,7 @@ def process():
             'password'='password'
         );"""
     t_env.execute_sql(source_ddl)
-    table = t_env.from_path('customers')
-    table.select(F.col('CustomerID')).execute().print()
+    t_env.from_path('customers').execute().print()
     
-
 if __name__ == '__main__':
     process()
