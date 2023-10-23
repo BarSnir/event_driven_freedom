@@ -10,6 +10,3 @@ def process():
     mysql_connector = MySqlConnector(logger)
     mysql_connector.create_database()
     mysql_connector.create_tables()
-    # schemas = mysql_connector.get_schemas()
-
-    
