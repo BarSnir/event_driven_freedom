@@ -19,6 +19,8 @@ class MySqlConnector:
         return self._connector.cursor()
     
     def create_database(self)-> None:
-        self._cursor.execute(f"CREATE DATABASE {os.getenv('DATABSE')}")
-        self.logger.info(f"Database {os.getenv('DATABSE')} created!")
-
+        try:
+            self._cursor.execute(f"CREATE DATABASE {os.getenv('DATABSE')}")
+            self.logger.info(f"Database {os.getenv('DATABSE')} created!")
+        except Exception as e:
+            self.logger.warn(e)
