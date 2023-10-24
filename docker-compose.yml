@@ -4,6 +4,8 @@ services:
     ports:
       - "8081:8081"
     command: jobmanager
+    volumes:
+      - /Users/barsnir/Desktop/flink_playground/flink-1.17.1/datasets/market_info:/opt/flink/datasets
     environment:
       - |
         FLINK_PROPERTIES=
@@ -13,6 +15,8 @@ services:
     depends_on:
       - jobmanager
     command: taskmanager
+    volumes:
+      - /Users/barsnir/Desktop/flink_playground/flink-1.17.1/datasets/market_info:/opt/flink/datasets
     scale: 1
     environment:
       - |
