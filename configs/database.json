@@ -44,11 +44,11 @@
         {
             "name": "Orders",
             "columns": [
-                "OrderId INT AUTO_INCREMENT PRIMARY KEY,",
-                "SiteToken TINYINT,",
+                "OrderId VARCHAR(255) UNIQUE PRIMARY KEY,",
+                "SiteToken VARCHAR(255) UNIQUE,",
                 "Price INT,",
-                "StatusId TINYINT,",
-                "CustomerId INT"
+                "StatusId INT,",
+                "CustomerId VARCHAR(255)"
             ]
         },
         {
