@@ -98,29 +98,30 @@ def process():
             'format' = 'csv'
         );
     """
-            # `AirBags` INT,
-            # `SunRoof` TINYINT,
-            # `MagnesiumWheels` TINYINT,
-            # `ReversSensors` TINYINT,
-            # `ABS` TINYINT,
-            # `Hybrid` TINYINT,
-            # `Doors` INT,
-            # `EnvironmentFriendlyLevel` INT,
-            # `SecurityTestLevel` INT,
-            # `HorsePower` INT,
-            # `CruseControl` TINYINT,
-            # `PowerWheel` TINYINT,
-            # `FullyAutonomic` TINYINT,
+
             
     sink_ddl = """
         CREATE TABLE MysqlSink (
-            `MarketInfoId` BIGINT,
+            `MarketInfoId` VARCHAR,
             `ManufacturerId` BIGINT,
             `ManufacturerText` VARCHAR,
             `ModelId` BIGINT,
             `ModelText` VARCHAR,
             `Year` INT,
             `MarketPrice` INT,
+            `AirBags` INT,
+            `SunRoof` TINYINT,
+            `MagnesiumWheels` TINYINT,
+            `ReversSensors` TINYINT,
+            `ABS` TINYINT,
+            `Hybrid` TINYINT,
+            `Doors` INT,
+            `EnvironmentFriendlyLevel` INT,
+            `SecurityTestLevel` INT,
+            `HorsePower` INT,
+            `CruseControl` TINYINT,
+            `PowerWheel` TINYINT,
+            `FullyAutonomic` TINYINT,
             PRIMARY KEY (MarketInfoId) NOT ENFORCED
         ) WITH (
             'connector' = 'jdbc',
@@ -143,32 +144,26 @@ def process():
         F.col('year').cast(DataTypes.INT()).alias('Year')
     ).filter(F.col('ManufacturerText') != 'make')
     market_info_table.select(
-        (
-            calc_gemetria(F.concat(F.col('ManufacturerText'), F.col('ModelText'))) \
-            + \
-            F.col('Year')
-            +
-            randrange(1, 1000000)
-        ).alias('MarketInfoId'),
-        # get_int_range('airbags').alias('AirBags'),
-        # get_mysql_boolean('Year_Sunroof',F.col('Year')).alias('SunRoof'),
-        # get_mysql_boolean('Year_MagnesiumWheels',F.col('Year')).alias('MagnesiumWheels'),
-        # get_mysql_boolean('Year_ReversSensors',F.col('Year')).alias('ReversSensors'),
-        # get_mysql_boolean(None, 0).alias('ABS'),
-        # get_mysql_boolean('Year_Hybrid',F.col('Year')).alias('Hybrid'),
-        # get_int_range(('doors')).alias('Doors'),
-        # get_int_range(('environment_friendly_level')).alias('EnvironmentFriendlyLevel'),
-        # get_int_range(('security_test_level')).alias('SecurityTestLevel'),
-        # get_int_range(('horse_power')).alias('HorsePower'),
-        # get_mysql_boolean('Year_CruseControl', F.col('Year')).alias('CruseControl'),
-        # get_mysql_boolean('Year_PowerWheel', F.col('Year')).alias('PowerWheel'),
-        # get_mysql_boolean('Year_FullyAutonomic' ,F.col('Year')).alias('FullyAutonomic'),
-        get_int_range('market_price').alias('MarketPrice'),
+        F.uuid().alias('MarketInfoId'),
         calc_gemetria(F.col('ManufacturerText')).alias('ManufacturerId'),
         F.col('ManufacturerText'),
         calc_gemetria(F.concat(F.col('ManufacturerText'), F.col('ModelText'))).alias('ModelId'),
         F.col('ModelText'),
-        F.col('Year')
+        F.col('Year'),
+        get_int_range('market_price').alias('MarketPrice'),
+        get_int_range('airbags').alias('AirBags'),
+        get_mysql_boolean('Year_Sunroof',F.col('Year')).alias('SunRoof'),
+        get_mysql_boolean('Year_MagnesiumWheels',F.col('Year')).alias('MagnesiumWheels'),
+        get_mysql_boolean('Year_ReversSensors',F.col('Year')).alias('ReversSensors'),
+        get_mysql_boolean(None, 0).alias('ABS'),
+        get_mysql_boolean('Year_Hybrid',F.col('Year')).alias('Hybrid'),
+        get_int_range(('doors')).alias('Doors'),
+        get_int_range(('environment_friendly_level')).alias('EnvironmentFriendlyLevel'),
+        get_int_range(('security_test_level')).alias('SecurityTestLevel'),
+        get_int_range(('horse_power')).alias('HorsePower'),
+        get_mysql_boolean('Year_CruseControl', F.col('Year')).alias('CruseControl'),
+        get_mysql_boolean('Year_PowerWheel', F.col('Year')).alias('PowerWheel'),
+        get_mysql_boolean('Year_FullyAutonomic' ,F.col('Year')).alias('FullyAutonomic'),
     ).execute_insert('MysqlSink').wait(60000)
 if __name__ == "__main__":
     process()
