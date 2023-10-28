@@ -1,4 +1,4 @@
-import time
+import random
 from random import randrange
 from pyflink.table.udf import udf
 from pyflink.table import ( 
@@ -7,6 +7,9 @@ from pyflink.table import (
     DataTypes,
     expressions as F
 )
+
+import logging
+logger = logging.getLogger()
 
 @udf(result_type=DataTypes.BIGINT())
 def calc_gemetria(text):
@@ -27,6 +30,39 @@ def calc_gemetria(text):
             continue
         total = total + num
     return total
+
+@udf(result_type=DataTypes.TINYINT())
+def get_mysql_boolean(col_condition_name, col_condition_value):
+    col_condition_dict = {
+        'Year_Sunroof': 2008,
+        'Year_MagnesiumWheels': 2005,
+        'Year_ReversSensors': 2002,
+        'Year_Hybrid': 2012,
+        'Year_CruseControl': 2005,
+        'Year_PowerWheel': 1999,
+        'Year_FullyAutonomic': 2021
+    }
+    col_condition = col_condition_dict.get(col_condition_name, None)
+    if col_condition is not None and col_condition > col_condition_value:
+        return 0
+    return random.randrange(0, 2)
+
+@udf(result_type=DataTypes.INT())
+def get_int_range(text):
+    col_range_dict = {
+        'airbags': {'low': 0, 'high': 5},
+        'doors': {'low': 2, 'high': 5},
+        'environment_friendly_level': {'low': 0, 'high': 11},
+        'security_test_level': {'low': 0, 'high': 11},
+        'horse_power': {'low': 8*10, 'high': 45*10},
+        'market_price': {'low': 1000*10, 'high': 45000*10},
+    }
+    col_range = col_range_dict.get(text, 0)
+    value = random.randrange(
+        col_range.get('low'), 
+        col_range.get('high')
+    )
+    return value
 
 def get_jars_path():
     return f'file:///opt/flink/opt/'
@@ -62,6 +98,20 @@ def process():
             'format' = 'csv'
         );
     """
+            # `AirBags` INT,
+            # `SunRoof` TINYINT,
+            # `MagnesiumWheels` TINYINT,
+            # `ReversSensors` TINYINT,
+            # `ABS` TINYINT,
+            # `Hybrid` TINYINT,
+            # `Doors` INT,
+            # `EnvironmentFriendlyLevel` INT,
+            # `SecurityTestLevel` INT,
+            # `HorsePower` INT,
+            # `CruseControl` TINYINT,
+            # `PowerWheel` TINYINT,
+            # `FullyAutonomic` TINYINT,
+            
     sink_ddl = """
         CREATE TABLE MysqlSink (
             `MarketInfoId` BIGINT,
@@ -70,6 +120,7 @@ def process():
             `ModelId` BIGINT,
             `ModelText` VARCHAR,
             `Year` INT,
+            `MarketPrice` INT,
             PRIMARY KEY (MarketInfoId) NOT ENFORCED
         ) WITH (
             'connector' = 'jdbc',
@@ -99,11 +150,25 @@ def process():
             +
             randrange(1, 1000000)
         ).alias('MarketInfoId'),
+        # get_int_range('airbags').alias('AirBags'),
+        # get_mysql_boolean('Year_Sunroof',F.col('Year')).alias('SunRoof'),
+        # get_mysql_boolean('Year_MagnesiumWheels',F.col('Year')).alias('MagnesiumWheels'),
+        # get_mysql_boolean('Year_ReversSensors',F.col('Year')).alias('ReversSensors'),
+        # get_mysql_boolean(None, 0).alias('ABS'),
+        # get_mysql_boolean('Year_Hybrid',F.col('Year')).alias('Hybrid'),
+        # get_int_range(('doors')).alias('Doors'),
+        # get_int_range(('environment_friendly_level')).alias('EnvironmentFriendlyLevel'),
+        # get_int_range(('security_test_level')).alias('SecurityTestLevel'),
+        # get_int_range(('horse_power')).alias('HorsePower'),
+        # get_mysql_boolean('Year_CruseControl', F.col('Year')).alias('CruseControl'),
+        # get_mysql_boolean('Year_PowerWheel', F.col('Year')).alias('PowerWheel'),
+        # get_mysql_boolean('Year_FullyAutonomic' ,F.col('Year')).alias('FullyAutonomic'),
+        get_int_range('market_price').alias('MarketPrice'),
         calc_gemetria(F.col('ManufacturerText')).alias('ManufacturerId'),
         F.col('ManufacturerText'),
         calc_gemetria(F.concat(F.col('ManufacturerText'), F.col('ModelText'))).alias('ModelId'),
         F.col('ModelText'),
         F.col('Year')
-    ).execute_insert('MysqlSink').wait(50000)
+    ).execute_insert('MysqlSink').wait(60000)
 if __name__ == "__main__":
     process()
