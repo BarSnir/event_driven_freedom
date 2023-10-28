@@ -61,14 +61,11 @@
         {
             "name": "MediaType",
             "columns": [
-                "MediaTypeId INT AUTO_INCREMENT PRIMARY KEY,",
-                "WithGooglePlay TINYINT(1),",
-                "WithApplePlay TINYINT(1),",
-                "AvailableDiskSlot TINYINT(1),",
-                "AvailableUsbSlots TINYINT(1),",
+                "MediaTypeId INT PRIMARY KEY,",
+                "AvailableDiskSlot BOOLEAN,",
                 "UsbSlotType VARCHAR(255),",
-                "WithDisplay VARCHAR(255),",
-                "TouchDisplay TINYINT(1)"
+                "UsbSlots INT,",
+                "IsTouchDisplay BOOLEAN"
             ]
         },
         {
