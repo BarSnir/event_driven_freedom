@@ -54,10 +54,8 @@
         {
             "name": "Statuses",
             "columns": [
-                "StatusId INT AUTO_INCREMENT PRIMARY KEY,",
-                "StatusText VARCHAR(255),",
-                "PackageId TINYINT,",
-                "PackageText VARCHAR(255)"
+                "StatusId INT UNIQUE PRIMARY KEY,",
+                "StatusText VARCHAR(255)"
             ]
         },
         {
