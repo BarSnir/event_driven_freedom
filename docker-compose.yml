@@ -1,38 +1,95 @@
 services:
   jobmanager:
-    image: flink:1.17.1-scala_2.12
+    container_name: jobmanager
+    platform: linux/arm64/v8
+    build:
+      context: ./images/pyflink
+      dockerfile: .Dockerfile
     ports:
       - "8081:8081"
     command: jobmanager
+    attach: false
     volumes:
-      - /Users/barsnir/Desktop/flink_playground/flink-1.17.1/datasets/market_info:/opt/flink/datasets
+      - ./datasets:/opt/flink/datasets
     environment:
       - |
         FLINK_PROPERTIES=
         jobmanager.rpc.address: jobmanager
+        jobmanager.memory.process.size: 4096m
   taskmanager:
-    image: flink:1.17.1-scala_2.12
+    container_name: taskmanager
+    platform: linux/arm64/v8
+    build:
+      context: ./images/pyflink
+      dockerfile: .Dockerfile
     depends_on:
       - jobmanager
     command: taskmanager
+    attach: false
     volumes:
-      - /Users/barsnir/Desktop/flink_playground/flink-1.17.1/datasets/market_info:/opt/flink/datasets
+      - ./datasets:/opt/flink/datasets
     scale: 1
     environment:
       - |
         FLINK_PROPERTIES=
         jobmanager.rpc.address: jobmanager
-        taskmanager.numberOfTaskSlots: 4
+        taskmanager.numberOfTaskSlots: 32
         parallelism.default: 4
-        state.backend: rocksdb
-        state.checkpoints.dir: file:///checkpoint-dir/
-        state.checkpoint-storage: filesystem
+        taskmanager.memory.process.size: 4096m
     links:
       - db:db
+  taskmanager2:
+    container_name: taskmanager2
+    platform: linux/arm64/v8
+    build:
+      context: ./images/pyflink
+      dockerfile: .Dockerfile
+    depends_on:
+      - jobmanager
+    command: taskmanager
+    attach: false
+    volumes:
+      - ./datasets:/opt/flink/datasets
+    scale: 1
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+        taskmanager.numberOfTaskSlots: 32
+        parallelism.default: 4
+        taskmanager.memory.process.size: 4096m
+    links:
+      - db:db
+  pyflink-client:
+    platform: linux/arm64/v8
+    container_name: pyflink-client
+    build:
+      context: ./images/pyflink
+      dockerfile: .Dockerfile
+    depends_on:
+      - jobmanager
+      - taskmanager
+    command: >
+      bash -c  "echo 'starting flink cluster in 30s' && sleep 30 && ./bin/flink run \
+      --jobmanager jobmanager:8081 \
+      -pyclientexec /usr/local/bin/python3 \
+      -pyexec /usr/local/bin/python3 \
+      -py /opt/flink/ops/generate_market_info.py"
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+        parallelism.default: 4
+    volumes:
+      - ./flink_process:/opt/flink/ops
+      - ./jars:/opt/flink/opt
+    scale: 1
   db:
+    container_name: legacy-mysql
     image: mysql:5.7
     platform: linux/x86_64
     restart: always
+    attach: false
     environment:
       MYSQL_DATABASE: 'db'
       MYSQL_USER: 'user'
