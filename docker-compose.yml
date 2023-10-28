@@ -15,17 +15,17 @@ services:
       - |
         FLINK_PROPERTIES=
         jobmanager.rpc.address: jobmanager
-        jobmanager.memory.process.size: 4096m
+        jobmanager.memory.process.size: 2000m
   taskmanager:
     container_name: taskmanager
     platform: linux/arm64/v8
+    attach: false
     build:
       context: ./images/pyflink
       dockerfile: .Dockerfile
     depends_on:
       - jobmanager
     command: taskmanager
-    attach: false
     volumes:
       - ./datasets:/opt/flink/datasets
     scale: 1
@@ -34,30 +34,11 @@ services:
         FLINK_PROPERTIES=
         jobmanager.rpc.address: jobmanager
         taskmanager.numberOfTaskSlots: 32
-        parallelism.default: 4
-        taskmanager.memory.process.size: 4096m
-    links:
-      - db:db
-  taskmanager2:
-    container_name: taskmanager2
-    platform: linux/arm64/v8
-    build:
-      context: ./images/pyflink
-      dockerfile: .Dockerfile
-    depends_on:
-      - jobmanager
-    command: taskmanager
-    attach: false
-    volumes:
-      - ./datasets:/opt/flink/datasets
-    scale: 1
-    environment:
-      - |
-        FLINK_PROPERTIES=
-        jobmanager.rpc.address: jobmanager
-        taskmanager.numberOfTaskSlots: 32
-        parallelism.default: 4
-        taskmanager.memory.process.size: 4096m
+        parallelism.default: 8
+        taskmanager.memory.process.size: 7500m
+        taskmanager.memory.framework.off-heap.size: 500m
+        taskmanager.memory.task.off-heap.size: 1000m
+        taskmanager.memory.jvm-metaspace.size: 400m
     links:
       - db:db
   pyflink-client:
@@ -74,7 +55,7 @@ services:
       --jobmanager jobmanager:8081 \
       -pyclientexec /usr/local/bin/python3 \
       -pyexec /usr/local/bin/python3 \
-      -py /opt/flink/ops/generate_market_info.py"
+      -py /opt/flink/ops/generate_vehicles.py"
     environment:
       - |
         FLINK_PROPERTIES=

@@ -3,11 +3,11 @@
         {
             "name": "Vehicles",
             "columns": [
-                "VehicleId INT AUTO_INCREMENT PRIMARY KEY,",
+                "VehicleId VARCHAR(255) UNIQUE PRIMARY KEY,",
                 "KM INT,",
                 "PrevOwnerNumber TINYINT,",
-                "OrderId INT,",
-                "MarketInfoId INT,",
+                "OrderId VARCHAR(255),",
+                "MarketInfoId VARCHAR(255),",
                 "MediaTypeId INT,",
                 "YearOnRoad INT,",
                 "TestDate DATE,",

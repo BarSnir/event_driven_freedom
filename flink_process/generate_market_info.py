@@ -97,9 +97,7 @@ def process():
             'path' = 'file:///opt/flink/datasets',
             'format' = 'csv'
         );
-    """
-
-            
+    """     
     sink_ddl = """
         CREATE TABLE MysqlSink (
             `MarketInfoId` VARCHAR,
