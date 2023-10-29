@@ -111,7 +111,6 @@ def process():
             'password'='password',
             'scan.fetch-size'='500'
     );"""
-
     sink_ddl = """
         CREATE TABLE MysqlSink (
             `CustomerId` INT,
