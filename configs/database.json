@@ -48,7 +48,7 @@
                 "SiteToken VARCHAR(255) UNIQUE,",
                 "Price INT,",
                 "StatusId INT,",
-                "CustomerId VARCHAR(255)"
+                "CustomerId INT"
             ]
         },
         {

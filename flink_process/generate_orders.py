@@ -17,6 +17,7 @@ def get_int_range(text):
     col_range_dict = {
         'price': {'low': 1000*10, 'high': 45000*10},
         'status_id': {'low': 1, 'high': 11},
+        'customer_id': {'low': 1, 'high': 8000},
     }
     col_range = col_range_dict.get(text, 0)
     value = random.randrange(
@@ -67,7 +68,7 @@ def process():
             `SiteToken` VARCHAR,
             `Price` INT,
             `StatusId` INT,
-            `CustomerId` VARCHAR,
+            `CustomerId` INT,
             PRIMARY KEY (OrderID) NOT ENFORCED
         ) WITH (
             'connector' = 'jdbc',
@@ -89,7 +90,7 @@ def process():
         get_site_token(16).alias('SiteToken'),
         get_int_range('price').alias('Price'),
         get_int_range('status_id').alias('StatusId'),
-        get_site_token(8).alias('CustomerId'),
+        get_int_range('customer_id').alias('CustomerId'),
     )
     market_info_table_execution.execute_insert("MysqlSink").wait(600000)
 if __name__ == "__main__":

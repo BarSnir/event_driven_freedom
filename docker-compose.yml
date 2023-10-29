@@ -64,6 +64,7 @@ services:
     volumes:
       - ./flink_process:/opt/flink/ops
       - ./jars:/opt/flink/opt
+      - ./datasets:/opt/flink/datasets
     scale: 1
   db:
     container_name: legacy-mysql
