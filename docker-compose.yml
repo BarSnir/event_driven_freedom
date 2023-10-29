@@ -51,11 +51,11 @@ services:
       - jobmanager
       - taskmanager
     command: >
-      bash -c  "echo 'starting flink cluster in 30s' && sleep 30 && ./bin/flink run \
+      bash -c  "echo 'starting pyflink operation in 30s' && sleep 30 && ./bin/flink run \
       --jobmanager jobmanager:8081 \
       -pyclientexec /usr/local/bin/python3 \
       -pyexec /usr/local/bin/python3 \
-      -py /opt/flink/ops/generate_images.py"
+      -py /opt/flink/ops/generate_customers.py"
     environment:
       - |
         FLINK_PROPERTIES=

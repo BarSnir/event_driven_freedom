@@ -99,14 +99,14 @@
         {
             "name": "Customers",
             "columns": [
-                "CustomerId INT AUTO_INCREMENT PRIMARY KEY,",
+                "CustomerId INT UNIQUE PRIMARY KEY,",
                 "FirstName VARCHAR(255),",
                 "LastName VARCHAR(255),",
                 "Password VARCHAR(255),",
                 "Email VARCHAR(255),",
                 "CustomerTypeId TINYINT,",
                 "CustomerTypeText VARCHAR(255),",
-                "JoinDate DATETIME,",
+                "JoinDate DATE,",
                 "ProfileImage VARCHAR(255),",
                 "IsSuspended TINYINT(1),",
                 "SuspendedReasonId TINYINT,",
