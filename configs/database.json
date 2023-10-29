@@ -80,9 +80,9 @@
         {
             "name": "Images",
             "columns": [
-                "ImageId INT AUTO_INCREMENT PRIMARY KEY,",
-                "OrderId INT,",
-                "Priority TINYINT,",
+                "ImageId VARCHAR(255) UNIQUE PRIMARY KEY,",
+                "OrderId VARCHAR(255),",
+                "Priority INT,",
                 "Url VARCHAR(255)"
             ]
         },
