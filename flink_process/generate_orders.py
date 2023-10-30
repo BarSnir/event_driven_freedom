@@ -93,5 +93,6 @@ def process():
         get_int_range('customer_id').alias('CustomerId'),
     )
     market_info_table_execution.execute_insert("MysqlSink").wait(600000)
+    
 if __name__ == "__main__":
     process()

@@ -55,7 +55,7 @@ services:
       --jobmanager jobmanager:8081 \
       -pyclientexec /usr/local/bin/python3 \
       -pyexec /usr/local/bin/python3 \
-      -py /opt/flink/ops/generate_customers.py"
+      -py /opt/flink/ops/generate_improves.py"
     environment:
       - |
         FLINK_PROPERTIES=

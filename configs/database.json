@@ -74,7 +74,7 @@
                 "ImproveId INT AUTO_INCREMENT PRIMARY KEY,",
                 "StageLevel TINYINT(1),",
                 "StageText VARCHAR(255),",
-                "PartsImprovedList JSON"
+                "PartsImprovedList VARCHAR(255)"
             ]
         },
         {
@@ -89,7 +89,7 @@
         {
             "name": "AuthTypes",
             "columns": [
-                "AuthTypeId INT AUTO_INCREMENT PRIMARY KEY,",
+                "AuthTypeId INT UNIQUE PRIMARY KEY,",
                 "AuthByGoogle TINYINT(1),",
                 "AuthByApple TINYINT(1),",
                 "AuthByFacebook TINYINT(1),",
