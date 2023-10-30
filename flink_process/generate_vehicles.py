@@ -50,7 +50,7 @@ def process():
     t_env.get_config().set('pipeline.jars',get_jars_full_path()) \
     .set('python.fn-execution.bundle.time', '100000') \
     .set('python.fn-execution.bundle.size', '10') \
-    .set('parallelism.default', '5')
+    .set('parallelism.default', '2')
 
     source_ddl = """
         CREATE TABLE MysqlSource (
@@ -84,7 +84,7 @@ def process():
             'table-name' = 'Vehicles',
             'username'='root',
             'password'='password',
-            'sink.parallelism' = '5',
+            'sink.parallelism' = '2',
             'sink.buffer-flush.interval' = '0',
             'sink.buffer-flush.max-rows' = '10',
             'sink.max-retries' = '10'

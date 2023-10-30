@@ -33,8 +33,8 @@ services:
       - |
         FLINK_PROPERTIES=
         jobmanager.rpc.address: jobmanager
-        taskmanager.numberOfTaskSlots: 16
-        parallelism.default: 8
+        taskmanager.numberOfTaskSlots: 4
+        parallelism.default: 4
         taskmanager.memory.process.size: 7500m
         taskmanager.memory.framework.off-heap.size: 500m
         taskmanager.memory.task.off-heap.size: 1000m
