@@ -25,5 +25,5 @@ for key in "${!pyflink_scripts[@]}"; do
       -pyclientexec /usr/local/bin/python3 \
       -pyexec /usr/local/bin/python3 \
       -py /opt/flink/ops/${pyflink_scripts[$key]}.py &>/dev/null
-    echo The job ${pyflink_scripts[$key]} is Done!
+    echo The job ${pyflink_scripts[$key]} is Done!;
 done
