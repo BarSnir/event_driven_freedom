@@ -57,14 +57,16 @@ def process():
             'sink.max-retries' = '10'
         );
     """
-    t_env.execute_sql(source_ddl)
-    t_env.execute_sql(sink_ddl)
+    source_table =t_env.execute_sql(source_ddl)
+    sink_table = t_env.execute_sql(sink_ddl)
     t_env.from_path('AuthSource').select(
         F.col('AuthTypeID'),
         F.if_then_else(F.col('AuthTypeID') == 1, 1, 0).alias('AuthByGoogle'),
         F.if_then_else(F.col('AuthTypeID') == 2, 1, 0).alias('AuthByApple'),
         F.if_then_else(F.col('AuthTypeID') == 3, 1, 0).alias('AuthByFacebook'),
         F.if_then_else(F.col('AuthTypeID') == 4, 1, 0).alias('AuthByTwitter'),
-    ).execute_insert('MysqlSink').wait(10000)
+    ).execute_insert('MysqlSink').wait()
+    source_table.collect().close()
+    sink_table.collect().close()
 if __name__ == "__main__":
     process()

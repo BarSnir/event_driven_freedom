@@ -28,7 +28,7 @@ class MySqlConnector:
 
     def create_tables(self)-> None:
         self._cursor.execute(f"USE {os.getenv('DATABASE')}")
-        with open("configs/database.json") as database_config:
+        with open(f"{os.getenv('DB_CONFIG')}") as database_config:
             for table in json.load(database_config).get('tables'):
                 table_name = table.get('name')
                 self.table_names.append(table_name)

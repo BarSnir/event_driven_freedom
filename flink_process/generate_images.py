@@ -35,7 +35,7 @@ def process():
     t_env.get_config().set('pipeline.jars',get_jars_full_path()) \
     .set('python.fn-execution.bundle.time', '100000') \
     .set('python.fn-execution.bundle.size', '10') \
-    .set('parallelism.default', '8')
+    .set('parallelism.default', '4')
     source_ddl = """
         CREATE TABLE MysqlSource (
             `OrderID` VARCHAR,
@@ -62,14 +62,14 @@ def process():
             'table-name' = 'Images',
             'username'='root',
             'password'='password',
-            'sink.parallelism' = '8',
+            'sink.parallelism' = '5',
             'sink.buffer-flush.interval' = '0',
             'sink.buffer-flush.max-rows' = '10',
             'sink.max-retries' = '10'
         );
     """
-    t_env.execute_sql(source_ddl)
-    t_env.execute_sql(sink_ddl)
+    source_table =t_env.execute_sql(source_ddl)
+    sink_table = t_env.execute_sql(sink_ddl)
     panda_table = t_env.from_path('MysqlSource').to_pandas()
     for item in panda_table.to_dict(orient='records'):
        order_id_list.append(item['OrderID'])
@@ -86,7 +86,8 @@ def process():
           letters = string.ascii_lowercase
           token = ''.join(random.choice(letters) for i in range(16))
           rows.append((token, order_id, image_number+1, f'site-url/{token}'))
-    t_env.from_elements(rows, CONST_DATATYPE).execute_insert('MysqlSink').wait(500000000)
-    
+    t_env.from_elements(rows, CONST_DATATYPE).execute_insert('MysqlSink').wait()
+    source_table.collect().close()
+    sink_table.collect().close()
 if __name__ == "__main__":
     process()

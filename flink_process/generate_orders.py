@@ -47,7 +47,7 @@ def process():
     t_env.get_config().set('pipeline.jars',get_jars_full_path()) \
     .set('python.fn-execution.bundle.time', '100000') \
     .set('python.fn-execution.bundle.size', '10') \
-    .set('parallelism.default', '8')
+    .set('parallelism.default', '4')
 
     source_ddl = """
         CREATE TABLE MysqlSource (
@@ -76,14 +76,14 @@ def process():
             'table-name' = 'Orders',
             'username'='root',
             'password'='password',
-            'sink.parallelism' = '8',
+            'sink.parallelism' = '5',
             'sink.buffer-flush.interval' = '0',
             'sink.buffer-flush.max-rows' = '10',
             'sink.max-retries' = '10'
         );
     """
-    t_env.execute_sql(source_ddl)
-    t_env.execute_sql(sink_ddl)
+    source_table =t_env.execute_sql(source_ddl)
+    sink_table = t_env.execute_sql(sink_ddl)
     market_info_table = t_env.from_path('MysqlSource')
     market_info_table_execution = market_info_table.select(
         F.col('OrderID'),
@@ -92,7 +92,8 @@ def process():
         get_int_range('status_id').alias('StatusId'),
         get_int_range('customer_id').alias('CustomerId'),
     )
-    market_info_table_execution.execute_insert("MysqlSink").wait(600000)
-    
+    market_info_table_execution.execute_insert("MysqlSink").wait()
+    source_table.collect().close()
+    sink_table.collect().close()
 if __name__ == "__main__":
     process()

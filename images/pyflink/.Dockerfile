@@ -16,5 +16,6 @@ ln -s /usr/local/bin/python3 /usr/local/bin/python && \
 apt-get clean && \
 rm -rf /var/lib/apt/lists/*
 
-# install PyFlink
-RUN pip3 install apache-flink==1.17.1
+# install PyFlink & dependencies
+COPY ./requirements.txt ./requirements.txt
+RUN pip3 install -r requirements.txt

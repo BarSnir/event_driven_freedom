@@ -38,7 +38,7 @@ def process():
     t_env.get_config().set('pipeline.jars',get_jars_full_path()) \
     .set('python.fn-execution.bundle.time', '100000') \
     .set('python.fn-execution.bundle.size', '10') \
-    .set('parallelism.default', '8')
+    .set('parallelism.default', '1')
 
     source_ddl = """
         CREATE TABLE MediaTypeSource (
@@ -67,20 +67,22 @@ def process():
             'table-name' = 'MediaType',
             'username'='root',
             'password'='password',
-            'sink.parallelism' = '8',
+            'sink.parallelism' = '1',
             'sink.buffer-flush.interval' = '0',
             'sink.buffer-flush.max-rows' = '10',
             'sink.max-retries' = '10'
         );
     """
-    t_env.execute_sql(source_ddl)
-    t_env.execute_sql(sink_ddl)
+    source_table =t_env.execute_sql(source_ddl)
+    sink_table = t_env.execute_sql(sink_ddl)
     t_env.from_path('MediaTypeSource').select(
        F.col('MediaTypeID'),
        F.col('AvailableDiskSlot'),
        get_slots_type().alias('UsbSlotType'),
        get_num_of_slots().alias('UsbSlots'),
        F.col('IsTouchDisplay'),
-    ).execute_insert("MysqlSink").wait(600000)
+    ).execute_insert("MysqlSink").wait()
+    source_table.collect().close()
+    sink_table.collect().close()
 if __name__ == "__main__":
     process()

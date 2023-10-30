@@ -84,8 +84,8 @@ def process():
     t_env = TableEnvironment.create(environment_settings)
     t_env.get_config().set('pipeline.jars',get_jars_full_path()) \
     .set('python.fn-execution.bundle.time', '100000') \
-    .set('python.fn-execution.bundle.size', '10') 
-
+    .set('python.fn-execution.bundle.size', '10') \
+    .set('parallelism.default', '4')
     source_ddl = """
         CREATE TABLE MarketInfoInit (
             `year` VARCHAR,
@@ -94,7 +94,7 @@ def process():
             `body_styles` VARCHAR
         ) WITH (
             'connector' = 'filesystem',
-            'path' = 'file:///opt/flink/datasets',
+            'path' = 'file:///opt/flink/datasets/market_info',
             'format' = 'csv'
         );
     """     
@@ -133,8 +133,8 @@ def process():
             'sink.max-retries' = '10'
         );
     """
-    t_env.execute_sql(source_ddl)
-    t_env.execute_sql(sink_ddl)
+    source_table = t_env.execute_sql(source_ddl)
+    sink_table = t_env.execute_sql(sink_ddl)
     market_info_table = t_env.from_path('MarketInfoInit')
     market_info_table = market_info_table.select(
         F.col('make').alias('ManufacturerText'),
@@ -162,6 +162,8 @@ def process():
         get_mysql_boolean('Year_CruseControl', F.col('Year')).alias('CruseControl'),
         get_mysql_boolean('Year_PowerWheel', F.col('Year')).alias('PowerWheel'),
         get_mysql_boolean('Year_FullyAutonomic' ,F.col('Year')).alias('FullyAutonomic'),
-    ).execute_insert('MysqlSink').wait(60000)
+    ).execute_insert('MysqlSink').wait()
+    source_table.collect().close()
+    sink_table.collect().close()
 if __name__ == "__main__":
     process()

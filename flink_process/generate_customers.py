@@ -133,15 +133,15 @@ def process():
             'table-name' = 'Customers',
             'username'='root',
             'password'='password',
-            'sink.parallelism' = '8',
+            'sink.parallelism' = '4',
             'sink.buffer-flush.interval' = '0',
             'sink.buffer-flush.max-rows' = '10',
             'sink.max-retries' = '10'
         );
     """
-    t_env.execute_sql(fs_source_ddl)
-    t_env.execute_sql(db_source_ddl)
-    t_env.execute_sql(sink_ddl)
+    fs_table = t_env.execute_sql(fs_source_ddl)
+    source_table = t_env.execute_sql(db_source_ddl)
+    sink_table = t_env.execute_sql(sink_ddl)
 
     
     panda_table = t_env.from_path('MysqlSource').to_pandas()
@@ -173,7 +173,9 @@ def process():
             F.col('CustomerId').cast(DataTypes.STRING()),
             '.jpeg'
         ).alias('ProfileImage'),
-    ).execute_insert('MysqlSink').wait(500000000)
-    
+    ).execute_insert('MysqlSink').wait()
+    fs_table.collect().close()
+    source_table.collect().close()
+    sink_table.collect().close()
 if __name__ == "__main__":
     process()

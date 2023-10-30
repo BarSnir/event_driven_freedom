@@ -92,13 +92,15 @@ def process():
             'sink.max-retries' = '10'
         );
     """
-    t_env.execute_sql(source_ddl)
-    t_env.execute_sql(sink_ddl)
+    source_table =t_env.execute_sql(source_ddl)
+    sink_table = t_env.execute_sql(sink_ddl)
     t_env.from_path('ImproveSource').select(
         F.col('ImproveId'),
         get_stage_level_id(F.col('ImproveId')).alias('StageLevel'),
         get_stage_level_text(F.col('ImproveId')).alias('StageText'),
         get_improved_parts(F.col('ImproveId')).alias('PartsImprovedList')
-    ).execute_insert("MysqlSink").wait(100000)
+    ).execute_insert("MysqlSink").wait()
+    source_table.collect().close()
+    sink_table.collect().close()
 if __name__ == "__main__":
     process()
