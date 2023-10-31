@@ -76,6 +76,7 @@ services:
     platform: linux/x86_64
     restart: always
     attach: false
+    command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW --server-id=1
     environment:
       MYSQL_DATABASE: 'db'
       MYSQL_USER: 'user'
@@ -91,6 +92,7 @@ services:
     image: confluentinc/cp-zookeeper:6.2.0
     container_name: zookeeper
     platform: linux/amd64
+    restart: always
     attach: false
     healthcheck:
       test: echo 'ruok' | nc -w 2 localhost 2181 | grep imok
@@ -109,6 +111,7 @@ services:
     container_name: broker
     platform: linux/amd64
     attach: false
+    restart: always
     healthcheck:
       test: nc -z localhost 9092 || exit -1
       start_period: 50s
@@ -136,9 +139,10 @@ services:
     container_name: schema-registry
     platform: linux/amd64
     attach: false
+    restart: always
     healthcheck:
       test: curl --output /dev/null --silent --head --fail http://schema-registry:8082/subjects
-      start_period: 3m
+      start_period: 5m
       interval: 30s
       timeout: 10s
       retries: 10
@@ -156,6 +160,7 @@ services:
     container_name: kafka-connect
     platform: linux/amd64
     attach: false
+    restart: always
     depends_on:
       schema-registry:
         condition: service_healthy
@@ -191,6 +196,7 @@ services:
     image: confluentinc/cp-enterprise-control-center:6.2.0
     container_name: control-center-a
     platform: linux/amd64
+    restart: always
     depends_on:
       kafka-connect:
         condition: service_healthy
