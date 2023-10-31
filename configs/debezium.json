@@ -46,10 +46,11 @@
     "topic.creation.applicationlogs.compression.type": "lz4",
     "value.converter": "io.confluent.connect.avro.AvroConverter",
     "value.converter.schema.registry.url": "http://schema-registry:8082",
-    "value.converter.enhanced.avro.schema.support": "true",
+    "value.converter.enhanced.avro.schema.support": "false",
     "transforms": "dropPrefix",
     "transforms.dropPrefix.type": "org.apache.kafka.connect.transforms.RegexRouter",
     "transforms.dropPrefix.regex": "prodcution.production.(.*)",
     "transforms.dropPrefix.replacement": "$1",
-    "delete.handling​.mode": "none"
+    "delete.handling​.mode": "none",
+    "connect.meta.data": "false"
 }
