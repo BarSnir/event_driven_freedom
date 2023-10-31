@@ -29,3 +29,4 @@ for key in "${!pyflink_scripts[@]}"; do
 done
 
 echo "Final step || Time to kafka! PyFlink batch jobs are done!"
+echo "Invited to take a look at Kafka's connect oeprtion at http://localhost:9021"

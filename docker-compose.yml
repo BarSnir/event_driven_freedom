@@ -9,6 +9,7 @@ services:
       - "8081:8081"
     command: jobmanager
     attach: false
+    restart: always
     volumes:
       - ./datasets:/opt/flink/datasets
     environment:
@@ -20,11 +21,39 @@ services:
     container_name: taskmanager
     platform: linux/arm64/v8
     attach: false
+    restart: no
     build:
       context: ./images/pyflink
       dockerfile: .Dockerfile
     depends_on:
       - jobmanager
+    command: taskmanager && sleep 800 && exit 0
+    volumes:
+      - ./datasets:/opt/flink/datasets
+    scale: 1
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+        taskmanager.numberOfTaskSlots: 4
+        parallelism.default: 4
+        taskmanager.memory.process.size: 7500m
+        taskmanager.memory.framework.off-heap.size: 500m
+        taskmanager.memory.task.off-heap.size: 1000m
+        taskmanager.memory.jvm-metaspace.size: 600m
+    links:
+      - db:db
+  taskmanager-stream:
+    container_name: taskmanager-stream
+    platform: linux/arm64/v8
+    attach: false
+    depends_on:
+      pyflink-client-batch:
+        condition: service_completed_successfully
+    restart: no
+    build:
+      context: ./images/pyflink
+      dockerfile: .Dockerfile
     command: taskmanager
     volumes:
       - ./datasets:/opt/flink/datasets
@@ -94,11 +123,11 @@ services:
     platform: linux/amd64
     restart: always
     attach: false
-    healthcheck:
-      test: echo 'ruok' | nc -w 2 localhost 2181 | grep imok
-      timeout: 10s
-      retries: 5
-      interval: 30s
+    # healthcheck:
+    #   test: echo 'ruok' | nc -w 2 localhost 2181 | grep imok
+    #   timeout: 10s
+    #   retries: 5
+    #   interval: 30s
     depends_on:
       pyflink-client-batch:
         condition: service_completed_successfully
@@ -112,15 +141,14 @@ services:
     platform: linux/amd64
     attach: false
     restart: always
-    healthcheck:
-      test: nc -z localhost 9092 || exit -1
-      start_period: 50s
-      interval: 20s
-      timeout: 10s
-      retries: 10
+    # healthcheck:
+    #   test: nc -z localhost 9092 || exit -1
+    #   start_period: 50s
+    #   interval: 20s
+    #   timeout: 10s
+    #   retries: 10
     depends_on:
-      zookeeper:
-        condition: service_healthy
+    - zookeeper
     ports:
       - 9092:9092
     environment:
@@ -140,17 +168,16 @@ services:
     platform: linux/amd64
     attach: false
     restart: always
-    healthcheck:
-      test: curl --output /dev/null --silent --head --fail http://schema-registry:8082/subjects
-      start_period: 5m
-      interval: 30s
-      timeout: 10s
-      retries: 10
+    # healthcheck:
+    #   test: curl --output /dev/null --silent --head --fail http://schema-registry:8082/subjects
+    #   start_period: 5m
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 10
     ports:
       - "8082:8082"
     depends_on:
-      broker:
-        condition: service_healthy
+      - broker
     environment:
       SCHEMA_REGISTRY_HOST_NAME: schema-registry
       SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: broker:29092
@@ -162,16 +189,15 @@ services:
     attach: false
     restart: always
     depends_on:
-      schema-registry:
-        condition: service_healthy
+      - schema-registry
     ports:
       - 8083:8083
-    healthcheck:
-      test: curl --output /dev/null --silent --head --fail http://kafka-connect:8083/
-      start_period: 5m
-      interval: 30s
-      timeout: 10s
-      retries: 10
+    # healthcheck:
+    #   test: curl --output /dev/null --silent --head --fail http://kafka-connect:8083/
+    #   start_period: 5m
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 10
     environment:
       CONNECT_BOOTSTRAP_SERVERS: "broker:29092"
       CONNECT_REST_PORT: 8083
@@ -197,15 +223,15 @@ services:
     container_name: control-center-a
     platform: linux/amd64
     restart: always
+    attach: false
     depends_on:
-      kafka-connect:
-        condition: service_healthy
-    healthcheck:
-      test: curl --output /dev/null --silent --head --fail http://localhost:9021/
-      start_period: 4m
-      interval: 30s
-      timeout: 10s
-      retries: 10
+      - kafka-connect
+    # healthcheck:
+    #   test: curl --output /dev/null --silent --head --fail http://localhost:9021/
+    #   start_period: 4m
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 10
     ports:
       - "9021:9021"
     environment:

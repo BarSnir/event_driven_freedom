@@ -1,10 +1,10 @@
 {
-    "name": "debezium_pyflink",
+    "name": "debezium_pyflink_v6",
     "connector.class": "io.debezium.connector.mysql.MySqlConnector",
     "database.history.kafka.bootstrap.servers": "broker:29092",
     "database.history.kafka.recovery.attempts": "8",
     "database.history.kafka.recovery.poll.interval.ms": "10000",
-    "database.history.kafka.topic": "history_pyflink_project_v9",
+    "database.history.kafka.topic": "history_pyflink_project_v6",
     "database.history.skip.unparseable.ddl": "false",
     "database.hostname": "db",
     "database.include.list": "production",
@@ -35,7 +35,7 @@
     "topic.creation.default.replication.factor": "1",
     "topic.creation.default.cleanup.policy": "compact",  
     "topic.creation.default.compression.type": "lz4",
-    "topic.creation.default.delete.retention.ms": 100000000,
+    "topic.creation.default.retention.ms": 100000000,
     "topic.creation.inventory.partitions": 1,
     "topic.creation.inventory.cleanup.policy": "compact",
     "topic.creation.inventory.delete.retention.ms": 100000000,
@@ -45,6 +45,11 @@
     "topic.creation.applicationlogs.retention.ms": 100000000,
     "topic.creation.applicationlogs.compression.type": "lz4",
     "value.converter": "io.confluent.connect.avro.AvroConverter",
-    "value.converter.schema.registry.url": "http://schemaregistry:8082",
-    "value.converter.enhanced.avro.schema.support": "true"
+    "value.converter.schema.registry.url": "http://schema-registry:8082",
+    "value.converter.enhanced.avro.schema.support": "true",
+    "transforms": "dropPrefix",
+    "transforms.dropPrefix.type": "org.apache.kafka.connect.transforms.RegexRouter",
+    "transforms.dropPrefix.regex": "prodcution.production.(.*)",
+    "transforms.dropPrefix.replacement": "$1",
+    "delete.handling​.mode": "none"
 }
