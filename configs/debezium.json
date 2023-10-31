@@ -1,10 +1,10 @@
 {
-    "name": "debezium_pyflink_v6",
+    "name": "debezium_pyflink_v1",
     "connector.class": "io.debezium.connector.mysql.MySqlConnector",
     "database.history.kafka.bootstrap.servers": "broker:29092",
     "database.history.kafka.recovery.attempts": "8",
     "database.history.kafka.recovery.poll.interval.ms": "10000",
-    "database.history.kafka.topic": "history_pyflink_project_v6",
+    "database.history.kafka.topic": "history_pyflink_project_v1",
     "database.history.skip.unparseable.ddl": "false",
     "database.hostname": "db",
     "database.include.list": "production",
