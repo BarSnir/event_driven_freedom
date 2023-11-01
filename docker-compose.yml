@@ -27,7 +27,7 @@ services:
       dockerfile: .Dockerfile
     depends_on:
       - jobmanager
-    command: taskmanager && sleep 800 && exit 0
+    command: taskmanager
     volumes:
       - ./datasets:/opt/flink/datasets
     scale: 1
