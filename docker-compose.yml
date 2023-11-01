@@ -168,12 +168,12 @@ services:
     platform: linux/amd64
     attach: false
     restart: always
-    # healthcheck:
-    #   test: curl --output /dev/null --silent --head --fail http://schema-registry:8082/subjects
-    #   start_period: 5m
-    #   interval: 30s
-    #   timeout: 10s
-    #   retries: 10
+    healthcheck:
+      test: curl --output /dev/null --silent --head --fail http://schema-registry:8082/subjects
+      start_period: 5m
+      interval: 30s
+      timeout: 10s
+      retries: 10
     ports:
       - "8082:8082"
     depends_on:
@@ -189,7 +189,8 @@ services:
     attach: false
     restart: always
     depends_on:
-      - schema-registry
+      schema-registry:
+        condition: service_healthy
     ports:
       - 8083:8083
     # healthcheck:
