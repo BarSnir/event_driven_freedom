@@ -81,6 +81,39 @@ def log_processing():
             'scan.startup.mode'='earliest-offset'
         )
     """
+    kafka_full_order_ddl = """
+        CREATE TABLE full_orders (
+            `order_id` VARCHAR,
+            `customer_id` INT,
+            `site_token` VARCHAR,
+            `status_id` INT,
+            `price` INT,
+            `images_urls` VARCHAR,
+            `images_count` BIGINT,
+            `first_name` VARCHAR,
+            `last_name` VARCHAR,
+            `email` VARCHAR,
+            `customer_type_id` INT,
+            `customer_type_text` VARCHAR,
+            `join_date` DATE,
+            `profile_image` VARCHAR,
+            `is_suspended` INT,
+            `suspended_reason_id` INT,
+            `suspended_reason_text` VARCHAR,
+            `auth_type_id` INT,
+            PRIMARY KEY (order_id) NOT ENFORCED
+        ) WITH (
+            'connector' = 'upsert-kafka',
+            'key.format' = 'raw',
+            'topic' = 'full_orders',
+            'properties.bootstrap.servers' = 'localhost:9092',
+            'value.format' = 'avro-confluent',
+            'value.avro-confluent.url' = 'http://localhost:8082',
+            'sink.parallelism' = '1',
+            'properties.auto.register.schemas'= 'true',
+            'properties.use.latest.version'= 'true'
+        )
+    """
     env_settings = EnvironmentSettings.new_instance() \
       .in_streaming_mode().build()
     t_env = TableEnvironment.create(env_settings)
@@ -91,6 +124,7 @@ def log_processing():
     t_env.execute_sql(kafka_orders_ddl)
     t_env.execute_sql(kafka_images_ddl)
     t_env.execute_sql(kafka_customers_ddl)
+    t_env.execute_sql(kafka_full_order_ddl)
 
     order_table = t_env.from_path('orders')
     images_table = t_env.from_path('images') \
@@ -145,6 +179,6 @@ def log_processing():
         F.col('images_count')
     ).join(customers).where(F.col('customer_id') == F.col('customer_id_table')) \
     .drop_columns(F.col('customer_id_table')) \
-    .execute().print()
+    .execute_insert('full_orders').wait()
 if __name__ == '__main__':
     log_processing()
