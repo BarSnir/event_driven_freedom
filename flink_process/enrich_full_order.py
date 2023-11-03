@@ -3,7 +3,7 @@ from pyflink.table import TableEnvironment, EnvironmentSettings
 from pyflink.table import expressions as F 
 from pyflink.table.expression import JsonOnNull, DataTypes
 def get_jars_path():
-    return f'file:///Users/barsnir/Desktop/projects/event_driven_freedom/jars/'
+    return f'file:///opt/flink/opt/'
 
 def get_env(key:str, default:str) -> str: 
   return os.getenv(key, default)
@@ -21,6 +21,7 @@ def get_jars_full_path() -> str:
   return full_str
 
 def log_processing():
+    print(f'Flink version:')
     kafka_orders_ddl = """
         CREATE TABLE orders (
             `OrderId` VARCHAR,
@@ -31,9 +32,9 @@ def log_processing():
         ) WITH (
             'connector' = 'kafka',
             'topic' = 'Orders',
-            'properties.bootstrap.servers' = 'localhost:9092',
+            'properties.bootstrap.servers' = 'broker:29092',
             'value.format' = 'debezium-avro-confluent',
-            'value.debezium-avro-confluent.url' = 'http://localhost:8082',
+            'value.debezium-avro-confluent.url' = 'http://schema-registry:8082',
             'properties.group.id'='one_consumer_v1',
             'properties.max.message.bytes'='3000000',
             'scan.startup.mode'='earliest-offset'
@@ -48,9 +49,9 @@ def log_processing():
         ) WITH (
             'connector' = 'kafka',
             'topic' = 'Images',
-            'properties.bootstrap.servers' = 'localhost:9092',
+            'properties.bootstrap.servers' = 'broker:29092',
             'value.format' = 'debezium-avro-confluent',
-            'value.debezium-avro-confluent.url' = 'http://localhost:8082',
+            'value.debezium-avro-confluent.url' = 'http://schema-registry:8082',
             'properties.group.id'='one_consumer_v1',
             'properties.max.message.bytes'='3000000',
             'scan.startup.mode'='earliest-offset'
@@ -73,9 +74,9 @@ def log_processing():
         ) WITH (
             'connector' = 'kafka',
             'topic' = 'Customers',
-            'properties.bootstrap.servers' = 'localhost:9092',
+            'properties.bootstrap.servers' = 'broker:29092',
             'value.format' = 'debezium-avro-confluent',
-            'value.debezium-avro-confluent.url' = 'http://localhost:8082',
+            'value.debezium-avro-confluent.url' = 'http://schema-registry:8082',
             'properties.group.id'='one_consumer_v1',
             'properties.max.message.bytes'='3000000',
             'scan.startup.mode'='earliest-offset'
@@ -101,17 +102,21 @@ def log_processing():
             `suspended_reason_id` INT,
             `suspended_reason_text` VARCHAR,
             `auth_type_id` INT,
+            `ingest` TIMESTAMP(3),
             PRIMARY KEY (order_id) NOT ENFORCED
         ) WITH (
             'connector' = 'upsert-kafka',
             'key.format' = 'raw',
             'topic' = 'full_orders',
-            'properties.bootstrap.servers' = 'localhost:9092',
+            'properties.bootstrap.servers' = 'broker:29092',
             'value.format' = 'avro-confluent',
-            'value.avro-confluent.url' = 'http://localhost:8082',
+            'value.avro-confluent.url' = 'http://schema-registry:8082',
             'sink.parallelism' = '1',
             'properties.auto.register.schemas'= 'true',
-            'properties.use.latest.version'= 'true'
+            'properties.use.latest.version'= 'true',
+            'properties.max.block.ms' = '600000',
+            'sink.buffer-flush.interval' = '100000',
+            'sink.buffer-flush.max-rows' = '10000'
         )
     """
     env_settings = EnvironmentSettings.new_instance() \
@@ -167,7 +172,7 @@ def log_processing():
         F.col('SuspendedReasonText').alias('suspended_reason_text'),
         F.col('AuthTypeId').alias('auth_type_id')
     )
-    order_table.join(images_table).where(F.col('OrderId') == F.col('images_order_id')) \
+    full_order = order_table.join(images_table).where(F.col('OrderId') == F.col('images_order_id')) \
     .drop_columns(F.col('images_order_id')) \
     .select(
        F.col('OrderId').alias('order_id'),
@@ -179,6 +184,8 @@ def log_processing():
         F.col('images_count')
     ).join(customers).where(F.col('customer_id') == F.col('customer_id_table')) \
     .drop_columns(F.col('customer_id_table')) \
-    .execute_insert('full_orders').wait()
+    .add_columns(F.local_timestamp().alias('ingest')) \
+    .order_by(F.col('ingest').asc)
+    full_order.execute_insert('full_orders').wait()
 if __name__ == '__main__':
     log_processing()

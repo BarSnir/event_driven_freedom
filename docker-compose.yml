@@ -21,7 +21,7 @@ services:
     container_name: taskmanager
     platform: linux/arm64/v8
     attach: false
-    restart: no
+    restart: always
     build:
       context: ./images/pyflink
       dockerfile: .Dockerfile
@@ -163,11 +163,11 @@ services:
     ports:
       - 8083:8083
     healthcheck:
-      test: curl --output /dev/null --silent --head --fail http://kafka-connect:8083/
+      test: curl http://kafka-connect:8083/ || exit 1
       start_period: 3m
       interval: 30s
       timeout: 10s
-      retries: 10
+      retries: 1
     environment:
       CONNECT_BOOTSTRAP_SERVERS: "broker:29092"
       CONNECT_REST_PORT: 8083
@@ -195,21 +195,20 @@ services:
     restart: always
     attach: false
     depends_on:
-      - kafka-connect
-    # healthcheck:
-    #   test: curl --output /dev/null --silent --head --fail http://localhost:9021/
-    #   start_period: 4m
-    #   interval: 30s
-    #   timeout: 10s
-    #   retries: 10
+      kafka-connect:
+        condition: service_healthy
+    healthcheck:
+      test: curl http://localhost:9021/ || exit 1
+      start_period: 3m
+      interval: 30s
+      timeout: 10s
+      retries: 1
     ports:
       - "9021:9021"
     environment:
       CONTROL_CENTER_BOOTSTRAP_SERVERS: 'broker:29092'
       CONTROL_CENTER_CONNECT_CONNECT_CLUSTER: 'kafka-connect:8083'
       CONTROL_CENTER_SCHEMA_REGISTRY_URL: "http://schema-registry:8082"
-      CONTROL_CENTER_KSQL_KSQLDB_URL: "http://ksqldb:8088"
-      CONTROL_CENTER_KSQL_KSQLDB_ADVERTISED_URL: "http://localhost:8088"
       CONFLUENT_METRICS_TOPIC_REPLICATION: 1
       CONTROL_CENTER_REPLICATION_FACTOR: 1
       CONTROL_CENTER_COMMAND_TOPIC_REPLICATION: 1
