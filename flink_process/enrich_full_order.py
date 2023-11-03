@@ -11,7 +11,7 @@ def get_env(key:str, default:str) -> str:
 def get_jars_full_path() -> str:
   jars_path = get_jars_path()
   jars = [
-    'flink-sql-connector-kafka-1.17.1.jar;',
+    'flink-sql-connector-kafka-3.0.0-1.17.jar;',
     'flink-sql-avro-1.17.1.jar;',
     'flink-sql-avro-confluent-registry-1.17.1.jar'
   ]
@@ -102,7 +102,6 @@ def log_processing():
             `suspended_reason_id` INT,
             `suspended_reason_text` VARCHAR,
             `auth_type_id` INT,
-            `ingest` TIMESTAMP(3),
             PRIMARY KEY (order_id) NOT ENFORCED
         ) WITH (
             'connector' = 'upsert-kafka',
@@ -183,9 +182,7 @@ def log_processing():
         F.col('images_urls'),
         F.col('images_count')
     ).join(customers).where(F.col('customer_id') == F.col('customer_id_table')) \
-    .drop_columns(F.col('customer_id_table')) \
-    .add_columns(F.local_timestamp().alias('ingest')) \
-    .order_by(F.col('ingest').asc)
+    .drop_columns(F.col('customer_id_table'))
     full_order.execute_insert('full_orders').wait()
 if __name__ == '__main__':
     log_processing()
