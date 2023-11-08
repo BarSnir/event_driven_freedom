@@ -1,7 +1,8 @@
 import os
 from pyflink.table import TableEnvironment, EnvironmentSettings
 from pyflink.table import expressions as F 
-from pyflink.table.expression import JsonOnNull, DataTypes
+from pyflink.table.expression import DataTypes
+
 def get_jars_path():
     return f'file:///opt/flink/opt/'
 
@@ -20,6 +21,7 @@ def get_jars_full_path() -> str:
     full_str = f'{full_str}{jars_path}{jar}'
   return full_str
 
+
 def log_processing():
     print(f'Flink version:')
     kafka_orders_ddl = """
@@ -28,7 +30,9 @@ def log_processing():
             `CustomerId` INT,
             `SiteToken` VARCHAR,
             `StatusId` INT,
-            `Price` INT
+            `Price` INT,
+            `ts` TIMESTAMP(3) METADATA FROM 'timestamp',
+            PRIMARY KEY (OrderId) NOT ENFORCED
         ) WITH (
             'connector' = 'kafka',
             'topic' = 'Orders',
@@ -45,7 +49,10 @@ def log_processing():
             `ImageId` VARCHAR,
             `OrderId` VARCHAR,
             `Url` VARCHAR,
-            `Priority` INT
+            `Priority` INT,
+            `ts` TIMESTAMP(3) METADATA FROM 'timestamp',
+            WATERMARK FOR `ts` AS `ts` - INTERVAL '1' MINUTE,
+            PRIMARY KEY (ImageId) NOT ENFORCED
         ) WITH (
             'connector' = 'kafka',
             'topic' = 'Images',
@@ -70,7 +77,9 @@ def log_processing():
             `IsSuspended` INT,
             `SuspendedReasonId` INT,
             `SuspendedReasonText` VARCHAR,
-            `AuthTypeId` INT
+            `AuthTypeId` INT,
+            `ts` TIMESTAMP(3) METADATA FROM 'timestamp',
+            PRIMARY KEY (CustomerId) NOT ENFORCED
         ) WITH (
             'connector' = 'kafka',
             'topic' = 'Customers',
@@ -122,7 +131,8 @@ def log_processing():
       .in_streaming_mode().build()
     t_env = TableEnvironment.create(env_settings)
     t_env.get_config().set('pipeline.jars',get_jars_full_path()) \
-    .set("parallelism.default", get_env('PARALLELISM', '1'))
+    .set("parallelism.default", get_env('PARALLELISM', '1')) \
+    .set("table.display.max-column-width", '2000')
 
 
     t_env.execute_sql(kafka_orders_ddl)
@@ -133,29 +143,14 @@ def log_processing():
     order_table = t_env.from_path('orders')
     images_table = t_env.from_path('images') \
     .rename_columns(F.col('OrderId').alias('ImageOrderId')) \
-    .add_columns(F.col('Priority').cast(DataTypes.STRING()).alias('ImagePriority'))
-    images_count = images_table.group_by(F.col('ImageOrderId')) \
+    .add_columns(F.col('Priority').cast(DataTypes.STRING()).alias('ImagePriority')) \
+    .add_columns(F.concat(F.col('Url'), '_', F.col('ImagePriority')).alias    ('ImagePriorityAgg')) \
+    .drop_columns(F.col('Priority'), F.col('Url'), F.col('ImageId')) \
+    .group_by(F.col('ImageOrderId')) \
     .select(
-      F.col('ImageOrderId'),
-      F.col('Url').count.alias('images_count')
-    )
-    images_urls = images_table.rename_columns(F.col('ImageOrderId').alias('images_order_id_urls')) \
-    .group_by(F.col('images_order_id_urls')) \
-    .select(
-      F.col('images_order_id_urls'),
-      F.json_object_agg(
-        JsonOnNull.NULL,
-        F.col('ImagePriority'),
-        F.col('Url')
-      ).alias('images_urls')
-    )
-    images_table = images_urls.join(images_count) \
-    .where(F.col('ImageOrderId') == F.col('images_order_id_urls')) \
-    .drop_columns(F.col('images_order_id_urls')) \
-    .select(
-        F.col('ImageOrderId').alias('images_order_id'),
-        F.col('images_urls'),
-        F.col('images_count')
+      F.col('ImageOrderId').alias('images_order_id'),
+      F.col('ImagePriorityAgg').count.alias('images_count'),
+      F.col('ImagePriorityAgg').list_agg(',').alias('images_urls')
     )
     customers = t_env.from_path('Customers').select(
        F.col('CustomerId').alias('customer_id_table'),
