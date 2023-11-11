@@ -71,3 +71,5 @@
 #   sleep 1 ;
 # done
 bash $SCRIPTS_PATH_DIR/steam_pipeline.sh
+echo 'All stream jobs are running, time to setup sink connectors.'
+wait

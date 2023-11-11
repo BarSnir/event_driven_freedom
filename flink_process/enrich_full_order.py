@@ -39,26 +39,23 @@ def log_processing():
             'properties.bootstrap.servers' = 'broker:29092',
             'value.format' = 'debezium-avro-confluent',
             'value.debezium-avro-confluent.url' = 'http://schema-registry:8082',
-            'properties.group.id'='one_consumer_v1',
+            'properties.group.id'='orders_consumer_v1',
             'properties.max.message.bytes'='3000000',
             'scan.startup.mode'='earliest-offset'
         )
     """
     kafka_images_ddl = """
-        CREATE TABLE images (
-            `ImageId` VARCHAR,
-            `OrderId` VARCHAR,
-            `Url` VARCHAR,
-            `Priority` INT,
-            `ts` TIMESTAMP(3) METADATA FROM 'timestamp',
-            PRIMARY KEY (ImageId) NOT ENFORCED
+        CREATE TABLE aggregate_images (
+            `images_order_id` VARCHAR,
+            `images_count` BIGINT,
+            `images_urls` VARCHAR
         ) WITH (
             'connector' = 'kafka',
-            'topic' = 'Images',
+            'topic' = 'aggregate_images',
             'properties.bootstrap.servers' = 'broker:29092',
-            'value.format' = 'debezium-avro-confluent',
-            'value.debezium-avro-confluent.url' = 'http://schema-registry:8082',
-            'properties.group.id'='one_consumer_v1',
+            'value.format' = 'avro-confluent',
+            'value.avro-confluent.url' = 'http://schema-registry:8082',
+            'properties.group.id'='agg_images_consumer_v1',
             'properties.max.message.bytes'='3000000',
             'scan.startup.mode'='earliest-offset'
         )
@@ -85,7 +82,7 @@ def log_processing():
             'properties.bootstrap.servers' = 'broker:29092',
             'value.format' = 'debezium-avro-confluent',
             'value.debezium-avro-confluent.url' = 'http://schema-registry:8082',
-            'properties.group.id'='one_consumer_v1',
+            'properties.group.id'='customers_consumer_v1',
             'properties.max.message.bytes'='3000000',
             'scan.startup.mode'='earliest-offset'
         )
@@ -122,8 +119,8 @@ def log_processing():
             'properties.auto.register.schemas'= 'true',
             'properties.use.latest.version'= 'true',
             'properties.max.block.ms' = '600000',
-            'sink.buffer-flush.interval' = '60000',
-            'sink.buffer-flush.max-rows' = '100000000'
+            'sink.buffer-flush.interval' = '100',
+            'sink.buffer-flush.max-rows' = '100'
         )
     """
     env_settings = EnvironmentSettings.new_instance() \
@@ -139,17 +136,7 @@ def log_processing():
     t_env.execute_sql(kafka_full_order_ddl)
 
     order_table = t_env.from_path('orders')
-    images_table = t_env.from_path('images') \
-    .rename_columns(F.col('OrderId').alias('ImageOrderId')) \
-    .add_columns(F.col('Priority').cast(DataTypes.STRING()).alias('ImagePriority')) \
-    .add_columns(F.concat(F.col('Url'), '_', F.col('ImagePriority')).alias    ('ImagePriorityAgg')) \
-    .drop_columns(F.col('Priority'), F.col('Url'), F.col('ImageId')) \
-    .group_by(F.col('ImageOrderId')) \
-    .select(
-      F.col('ImageOrderId').alias('images_order_id'),
-      F.col('ImagePriorityAgg').count.alias('images_count'),
-      F.col('ImagePriorityAgg').list_agg(',').alias('images_urls')
-    )
+    images_table = t_env.from_path('aggregate_images')
     customers = t_env.from_path('Customers').select(
        F.col('CustomerId').alias('customer_id_table'),
         F.col('FirstName').alias('first_name'),
