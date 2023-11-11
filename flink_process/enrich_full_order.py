@@ -51,7 +51,6 @@ def log_processing():
             `Url` VARCHAR,
             `Priority` INT,
             `ts` TIMESTAMP(3) METADATA FROM 'timestamp',
-            WATERMARK FOR `ts` AS `ts` - INTERVAL '1' MINUTE,
             PRIMARY KEY (ImageId) NOT ENFORCED
         ) WITH (
             'connector' = 'kafka',
@@ -123,8 +122,8 @@ def log_processing():
             'properties.auto.register.schemas'= 'true',
             'properties.use.latest.version'= 'true',
             'properties.max.block.ms' = '600000',
-            'sink.buffer-flush.interval' = '100000',
-            'sink.buffer-flush.max-rows' = '10000'
+            'sink.buffer-flush.interval' = '60000',
+            'sink.buffer-flush.max-rows' = '100000000'
         )
     """
     env_settings = EnvironmentSettings.new_instance() \
@@ -133,7 +132,6 @@ def log_processing():
     t_env.get_config().set('pipeline.jars',get_jars_full_path()) \
     .set("parallelism.default", get_env('PARALLELISM', '1')) \
     .set("table.display.max-column-width", '2000')
-
 
     t_env.execute_sql(kafka_orders_ddl)
     t_env.execute_sql(kafka_images_ddl)
