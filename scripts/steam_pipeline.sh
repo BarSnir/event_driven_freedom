@@ -5,6 +5,7 @@ echo 'Step D || Starting Full enrich, take a look at control center at http://lo
 declare -a pyflink_scripts=(
     [1]="aggregate_images"
     [2]="enrich_full_order"
+    [3]="enrich_full_vehicle"
 )
 
 for key in "${!pyflink_scripts[@]}"; do
