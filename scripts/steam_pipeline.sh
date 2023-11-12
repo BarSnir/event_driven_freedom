@@ -3,13 +3,13 @@ echo 'Step D || Starting Full enrich, take a look at control center at http://lo
 
 # Yes the order is necessary :)
 declare -a pyflink_scripts=(
-    [1]="aggregate_images"
-    [2]="enrich_full_order"
+    # [1]="aggregate_images"
+    # [2]="enrich_full_order"
     [3]="enrich_full_vehicle"
 )
 
 for key in "${!pyflink_scripts[@]}"; do
-    echo Job ${pyflink_scripts[$key]} Is Running! $key out of 2.
+    echo Job ${pyflink_scripts[$key]} Is Running! $key out of 3.
    ./bin/flink run \
       --detached \
       --jobmanager jobmanager:8081 \

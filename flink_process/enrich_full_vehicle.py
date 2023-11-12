@@ -86,11 +86,11 @@ def log_processing():
     kafka_media_type_ddl = """
         CREATE TABLE media_types (
             `MediaTypeId` INT,
-            `AvailableDiskSlot` BOOLEAN,
-            `UsbSlotType`,
+            `AvailableDiskSlot` INT,
+            `UsbSlotType` VARCHAR,
             `UsbSlots` INT,
-            `IsTouchDisplay` BOOLEAN,
-            `PRIMARY` KEY (MediaTypeId) NOT ENFORCED
+            `IsTouchDisplay` INT,
+            PRIMARY KEY (MediaTypeId) NOT ENFORCED
         ) WITH (
             'connector' = 'kafka',
             'topic' = 'MediaType',
@@ -152,10 +152,10 @@ def log_processing():
             `power_wheel` TINYINT,
             `fully_autonomic` TINYINT,
             `market_price` INT,
-            `available_disk_slot` BOOLEAN,
-            `usb_slot_type`,
+            `available_disk_slot` INT,
+            `usb_slot_type` VARCHAR,
             `usb_slots` INT,
-            `is_touch_display` BOOLEAN,
+            `is_touch_display` INT,
             `stage_level` TINYINT,
             `stage_text` VARCHAR,
             `parts_improved_list` VARCHAR,
