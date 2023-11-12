@@ -6,10 +6,11 @@ declare -a pyflink_scripts=(
     [1]="aggregate_images"
     [2]="enrich_full_order"
     [3]="enrich_full_vehicle"
+    [4]="full_ad_enrich"
 )
 
 for key in "${!pyflink_scripts[@]}"; do
-    echo Job ${pyflink_scripts[$key]} Is Running! $key out of 3.
+    echo Job ${pyflink_scripts[$key]} Is Running! $key out of 4.
    ./bin/flink run \
       --detached \
       --jobmanager jobmanager:8081 \
