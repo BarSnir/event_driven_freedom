@@ -3,8 +3,8 @@ echo 'Step D || Starting Full enrich, take a look at control center at http://lo
 
 # Yes the order is necessary :)
 declare -a pyflink_scripts=(
-    # [1]="aggregate_images"
-    # [2]="enrich_full_order"
+    [1]="aggregate_images"
+    [2]="enrich_full_order"
     [3]="enrich_full_vehicle"
 )
 
