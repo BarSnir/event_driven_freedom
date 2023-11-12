@@ -180,8 +180,7 @@ def log_processing():
     t_env = TableEnvironment.create(env_settings)
     t_env.get_config().set('pipeline.jars',get_jars_full_path()) \
     .set("parallelism.default", get_env('PARALLELISM', '1')) \
-    .set("table.display.max-column-width", '2000') \
-    .set("table.exec.source.cdc-events-duplicate", "true")
+    .set("table.display.max-column-width", '2000')
 
 
     ddl_list = [

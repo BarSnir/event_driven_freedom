@@ -1,6 +1,6 @@
 # !/bin/bash
-bash $SCRIPTS_PATH_DIR/database_setup.sh
-wait
+# bash $SCRIPTS_PATH_DIR/database_setup.sh
+# wait
 sleep 300
 echo 'Step C || Setup Debezium connector & fetching Data...'
 curl --location --request PUT 'http://kafka-connect:8083/connectors/debezium_pyflink_v1/config' \

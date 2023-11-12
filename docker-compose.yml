@@ -1,74 +1,4 @@
 services:
-  jobmanager:
-    container_name: jobmanager
-    platform: linux/arm64/v8
-    build:
-      context: ./images/pyflink
-      dockerfile: .Dockerfile
-    ports:
-      - "8081:8081"
-    command: jobmanager
-    attach: false
-    restart: always
-    volumes:
-      - ./datasets:/opt/flink/datasets
-    environment:
-      - |
-        FLINK_PROPERTIES=
-        jobmanager.rpc.address: jobmanager
-        jobmanager.memory.process.size: 2000m
-  taskmanager:
-    container_name: taskmanager
-    platform: linux/arm64/v8
-    attach: false
-    restart: always
-    build:
-      context: ./images/pyflink
-      dockerfile: .Dockerfile
-    depends_on:
-      - jobmanager
-    command: taskmanager
-    volumes:
-      - ./datasets:/opt/flink/datasets
-    scale: 1
-    environment:
-      - |
-        FLINK_PROPERTIES=
-        jobmanager.rpc.address: jobmanager
-        taskmanager.numberOfTaskSlots: 8
-        parallelism.default: 8
-        taskmanager.memory.process.size: 7500m
-        taskmanager.memory.framework.off-heap.size: 500m
-        taskmanager.memory.task.off-heap.size: 1000m
-        taskmanager.memory.jvm-metaspace.size: 600m
-    links:
-      - db:db
-  pyflink-client:
-    platform: linux/arm64/v8
-    container_name: pyflink-client
-    build:
-      context: ./images/pyflink
-      dockerfile: .Dockerfile
-    depends_on:
-      - jobmanager
-      - taskmanager
-    command: >
-      bash -c  "chmod +x ./project && chmod +x ./project/scripts/steps.sh && \
-      ./project/scripts/steps.sh"
-    environment:
-      - DATABASE=production
-      - DB_HOST=db
-      - DB_USER=root
-      - DB_PASSWORD=password
-      - ENV=development
-      - DB_CONFIG=/opt/flink/project/configs/database.json
-      - SCRIPTS_PATH_DIR=/opt/flink/project/scripts
-    volumes:
-      - ./flink_process:/opt/flink/ops
-      - ./jars:/opt/flink/opt
-      - ./datasets:/opt/flink/datasets
-      - .:/opt/flink/project
-    scale: 1
   db:
     container_name: legacy-mysql
     image: mysql:5.7
@@ -223,5 +153,75 @@ services:
       - -c 
       - |
         /etc/confluent/docker/run
+  jobmanager:
+    container_name: jobmanager
+    platform: linux/arm64/v8
+    build:
+      context: ./images/pyflink
+      dockerfile: .Dockerfile
+    ports:
+      - "8081:8081"
+    command: jobmanager
+    attach: false
+    restart: always
+    volumes:
+      - ./datasets:/opt/flink/datasets
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+        jobmanager.memory.process.size: 2000m
+  taskmanager:
+    container_name: taskmanager
+    platform: linux/arm64/v8
+    attach: false
+    restart: always
+    build:
+      context: ./images/pyflink
+      dockerfile: .Dockerfile
+    depends_on:
+      - jobmanager
+    command: taskmanager
+    volumes:
+      - ./datasets:/opt/flink/datasets
+    scale: 1
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+        taskmanager.numberOfTaskSlots: 8
+        parallelism.default: 8
+        taskmanager.memory.process.size: 7500m
+        taskmanager.memory.framework.off-heap.size: 500m
+        taskmanager.memory.task.off-heap.size: 1000m
+        taskmanager.memory.jvm-metaspace.size: 600m
+    links:
+      - db:db
+  pyflink-client:
+    platform: linux/arm64/v8
+    container_name: pyflink-client
+    build:
+      context: ./images/pyflink
+      dockerfile: .Dockerfile
+    depends_on:
+      kafka-connect:
+        condition: service_healthy
+    command: >
+      bash -c  "chmod +x ./project && chmod +x ./project/scripts/steps.sh && \
+      ./project/scripts/steps.sh"
+    environment:
+      - DATABASE=production
+      - DB_HOST=db
+      - DB_USER=root
+      - DB_PASSWORD=password
+      - ENV=development
+      - DB_CONFIG=/opt/flink/project/configs/database.json
+      - SCRIPTS_PATH_DIR=/opt/flink/project/scripts
+    volumes:
+      - ./flink_process:/opt/flink/ops
+      - ./jars:/opt/flink/opt
+      - ./datasets:/opt/flink/datasets
+      - .:/opt/flink/project
+    scale: 1
 volumes:
   my-db:
