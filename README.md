@@ -19,6 +19,10 @@ https://drive.google.com/file/d/1xcJzDR0OytQTqq8ymZlrWXqOCxrBSMuW/view?usp=shari
 
 # TODO:
 
+## Code:
+- Organize the code with class for py-module section.
+
+
 ## Stream processing for full ads:
 - Elasticsearch (search engine cercaria)
 - Neo4j (recommendation system with impression)
@@ -33,6 +37,8 @@ https://drive.google.com/file/d/1xcJzDR0OytQTqq8ymZlrWXqOCxrBSMuW/view?usp=shari
 - DruidDB for real time analytics.
 
 ## Infrastructure:
+- Running the entire process with databases setup,
+after the project deploy.
 - Fine tune the stack the comes up.
 - Kafka connect cluster.
 - Installing contextual connectors.
