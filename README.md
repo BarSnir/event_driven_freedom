@@ -27,6 +27,11 @@ https://drive.google.com/file/d/1xcJzDR0OytQTqq8ymZlrWXqOCxrBSMuW/view?usp=shari
 - Neo4j Image.
 - AWS Account.
 - Salesforce account.
+- Prometheus + Grafana image.
+- JMX on Flink + Kafka Topics to track event flow.
 
 ## Analytics:
 - Random impression producer.
+
+## Frontend + Backend:
+- Need to plan legacy stack and transformation to the new stack.
