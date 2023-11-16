@@ -204,7 +204,7 @@ services:
       context: ./images/pyflink
       dockerfile: .Dockerfile
     depends_on:
-      kafka-connect:
+      control-center-a:
         condition: service_healthy
     command: >
       bash -c  "chmod +x ./project && chmod +x ./project/scripts/steps.sh && \
