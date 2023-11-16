@@ -18,5 +18,5 @@ for key in "${!pyflink_scripts[@]}"; do
       -pyexec /usr/local/bin/python3 \
       -py /opt/flink/ops/${pyflink_scripts[$key]}.py &
     echo The job ${pyflink_scripts[$key]} is runnig!
-    sleep 250;
+    sleep 180;
 done
