@@ -1,3 +1,4 @@
+version: "3"
 services:
   db:
     container_name: legacy-mysql
@@ -204,8 +205,9 @@ services:
       context: ./images/pyflink
       dockerfile: .Dockerfile
     depends_on:
-      control-center-a:
-        condition: service_healthy
+      # control-center-a:
+      #   condition: service_healthy
+      - taskmanager
     command: >
       bash -c  "chmod +x ./project && chmod +x ./project/scripts/steps.sh && \
       ./project/scripts/steps.sh"
@@ -222,6 +224,7 @@ services:
       - ./jars:/opt/flink/opt
       - ./datasets:/opt/flink/datasets
       - .:/opt/flink/project
+      - /var/run/docker.sock:/var/run/docker.sock
     scale: 1
 volumes:
   my-db:

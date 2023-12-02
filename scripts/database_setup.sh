@@ -1,5 +1,4 @@
 #!/bin/bash
-sleep 30
 echo 'Step A || Creating databases & tables'
 python3 /opt/flink/project/main.py
 
@@ -19,7 +18,7 @@ declare -a pyflink_scripts=(
 )
 
 for key in "${!pyflink_scripts[@]}"; do
-    echo Job ${pyflink_scripts[$key]} Is Running! $key out of 9.
+    echo Job ${pyflink_scripts[$key]} Is Running! $key out of ${#pyflink_scripts[@]}.
     ./bin/flink run \
       --jobmanager jobmanager:8081 \
       -pyclientexec /usr/local/bin/python3 \

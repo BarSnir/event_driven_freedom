@@ -10,13 +10,14 @@ declare -a pyflink_scripts=(
 )
 
 for key in "${!pyflink_scripts[@]}"; do
-    echo Job ${pyflink_scripts[$key]} Is Running! $key out of 4.
+    echo Job ${pyflink_scripts[$key]} Is Running! $key out of ${#pyflink_scripts[@]}.
    ./bin/flink run \
-      --detached \
-      --jobmanager jobmanager:8081 \
-      -pyclientexec /usr/local/bin/python3 \
-      -pyexec /usr/local/bin/python3 \
-      -py /opt/flink/ops/${pyflink_scripts[$key]}.py &
+        --detached \
+        --jobmanager jobmanager:8081 \
+        -pyclientexec /usr/local/bin/python3 \
+        -pyexec /usr/local/bin/python3 \
+        -pyfs file:///opt/flink/ops/ \
+        -py /opt/flink/ops/${pyflink_scripts[$key]}.py &
     echo The job ${pyflink_scripts[$key]} is runnig!
     sleep 180;
 done

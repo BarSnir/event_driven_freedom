@@ -1,7 +1,8 @@
 # !/bin/bash
 # bash $SCRIPTS_PATH_DIR/database_setup.sh
-# wait
-# echo 'Step C || Setup Debezium connector & fetching Data...'
+echo 'Step C || Setup Debezium connector & fetching Data...'
+sleep 60
+python3 /opt/flink/project/restart_taksmanager.py
 # curl --location --request PUT 'http://kafka-connect:8083/connectors/debezium_pyflink_v1/config' \
 # --header 'Content-Type: application/json' \
 # --data '{
@@ -69,6 +70,6 @@
 #   x=$(( $x + 1 ))
 #   sleep 1 ;
 # done
-bash $SCRIPTS_PATH_DIR/steam_pipeline.sh
-echo 'All stream jobs are running, time to setup sink connectors.'
-wait
+# bash $SCRIPTS_PATH_DIR/steam_pipeline.sh
+# echo 'All stream jobs are running, time to setup sink connectors.'
+# wait
