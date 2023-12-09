@@ -172,6 +172,7 @@ services:
         FLINK_PROPERTIES=
         jobmanager.rpc.address: jobmanager
         jobmanager.memory.process.size: 2000m
+        taskmanager.memory.jvm-metaspace.size: 600m
   taskmanager:
     container_name: taskmanager
     platform: linux/arm64/v8
@@ -180,8 +181,6 @@ services:
     build:
       context: ./images/pyflink
       dockerfile: .Dockerfile
-    depends_on:
-      - jobmanager
     command: taskmanager
     volumes:
       - ./datasets:/opt/flink/datasets
@@ -192,24 +191,25 @@ services:
         jobmanager.rpc.address: jobmanager
         taskmanager.numberOfTaskSlots: 8
         parallelism.default: 8
-        taskmanager.memory.process.size: 7500m
-        taskmanager.memory.framework.off-heap.size: 500m
-        taskmanager.memory.task.off-heap.size: 1000m
+        taskmanager.memory.process.size: 9500m
+        taskmanager.memory.flink.size:  8500m
+        taskmanager.memory.framework.heap.size: 1500m
+        taskmanager.memory.task.heap.size: 1500m
+        taskmanager.memory.framework.off-heap.size: 3000m
+        taskmanager.memory.task.off-heap.size: 1500m
         taskmanager.memory.jvm-metaspace.size: 600m
+        taskmanager.memory.managed.size: 200m
     links:
       - db:db
   pyflink-client:
     platform: linux/arm64/v8
     container_name: pyflink-client
+    user: "root:root"
     build:
       context: ./images/pyflink
       dockerfile: .Dockerfile
-    depends_on:
-      # control-center-a:
-      #   condition: service_healthy
-      - taskmanager
     command: >
-      bash -c  "chmod +x ./project && chmod +x ./project/scripts/steps.sh && \
+      bash -c  "chmod +x ./project && \
       ./project/scripts/steps.sh"
     environment:
       - DATABASE=production

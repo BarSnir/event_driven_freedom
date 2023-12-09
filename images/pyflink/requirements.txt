@@ -2,3 +2,4 @@ mysql-connector-python==8.0.30
 python-dotenv==1.0.0
 colorlog==6.7.0
 apache-flink==1.17.1
+docker==6.1.3

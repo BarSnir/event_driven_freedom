@@ -1,8 +1,8 @@
 # !/bin/bash
+# echo "Pre step - Please prefrom chmod +x /var/run/docker.sock"
 # bash $SCRIPTS_PATH_DIR/database_setup.sh
-echo 'Step C || Setup Debezium connector & fetching Data...'
-sleep 60
-python3 /opt/flink/project/restart_taksmanager.py
+# echo 'Step C || Setup Debezium connector & fetching Data...'
+# python3 /opt/flink/project/scripts/restart_taksmanager.py
 # curl --location --request PUT 'http://kafka-connect:8083/connectors/debezium_pyflink_v1/config' \
 # --header 'Content-Type: application/json' \
 # --data '{
@@ -61,15 +61,8 @@ python3 /opt/flink/project/restart_taksmanager.py
 #     "delete.handling​.mode": "none",
 #     "connect.meta.data": "false"
 # }' &>/dev/null
-# wait
 # echo "Waiting for Debeizuim connector task to be done." 
-# x=1
-# while [ $x -le 120 ]
-# do
-#   echo -ne "${x}s/120s ..."\\r
-#   x=$(( $x + 1 ))
-#   sleep 1 ;
-# done
-# bash $SCRIPTS_PATH_DIR/steam_pipeline.sh
-# echo 'All stream jobs are running, time to setup sink connectors.'
-# wait
+# sleep 120
+bash $SCRIPTS_PATH_DIR/steam_pipeline.sh
+echo 'All stream jobs are running, time to setup sink connectors.'
+wait

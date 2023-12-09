@@ -1,6 +1,5 @@
 
 FROM apache/flink:1.17.1
-
 # The liblzma-dev is important to apache beam runtime
 RUN apt-get update -y && \
 apt-get install -y build-essential liblzma-dev libssl-dev zlib1g-dev libbz2-dev libffi-dev && \

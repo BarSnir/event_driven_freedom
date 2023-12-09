@@ -1,5 +1,6 @@
 #!/bin/bash
 echo 'Step A || Creating databases & tables'
+sleep 30
 python3 /opt/flink/project/main.py
 
 echo 'Step B || Generating datasets in 20s with Flink batch opersions!'
@@ -24,7 +25,7 @@ for key in "${!pyflink_scripts[@]}"; do
       -pyclientexec /usr/local/bin/python3 \
       -pyexec /usr/local/bin/python3 \
       -py /opt/flink/ops/${pyflink_scripts[$key]}.py &>/dev/null
-    echo The job ${pyflink_scripts[$key]} is Done! ;
+    echo The job ${pyflink_scripts[$key]} is Done!;
 done
 
 echo "Time to kafka! PyFlink batch jobs are done!"
