@@ -19,5 +19,5 @@ for key in "${!pyflink_scripts[@]}"; do
         -pyfs file:///opt/flink/ops/ \
         -py /opt/flink/ops/${pyflink_scripts[$key]}.py &
     echo The job ${pyflink_scripts[$key]} is runnig!
-    sleep 180;
+    sleep 120;
 done
