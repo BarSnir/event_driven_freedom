@@ -1,4 +1,23 @@
 services:
+  server-legacy:
+    container_name: legacy-server
+    build: ./backend/legacy
+    links:
+      - db
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+  server-modern:
+    container_name: modern-server
+    platform: linux/x86_64
+    build: ./backend/modern
+    links:
+      - db
+    ports:
+      - "80:80"
+    depends_on:
+      - db
   db:
     container_name: legacy-mysql
     image: mysql:5.7
