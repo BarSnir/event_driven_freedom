@@ -2,10 +2,12 @@ from typing import Union
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI
 from .v1.customers.routers import router as customers_router
+from .v1.auth.routers import router as auth_router
 
 app = FastAPI()
 
 app.include_router(customers_router)
+app.include_router(auth_router)
 
 origins = [
     "http://localhost",
@@ -26,11 +28,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# @app.get("/")
-# def read_root():
-#     return {"Hello": "World"}
-
-
-# @app.get("/items/{item_id}")
-# def read_item(item_id: int, q: Union[str, None] = None):
-#     return {"item_id": item_id, "q": q}
+@app.get("/")
+def healthCheck():
+    return {"Server": "Live"}

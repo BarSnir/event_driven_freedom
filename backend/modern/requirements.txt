@@ -6,3 +6,4 @@ passlib[bcrypt]
 pymysql
 cryptography
 pydantic[email]
+pydantic-settings

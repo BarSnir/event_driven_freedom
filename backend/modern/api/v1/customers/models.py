@@ -30,4 +30,8 @@ class CustomerResponseModel(BaseModel):
     SuspendedReasonText: str 
     AuthTypeId: int 
     JoinDate: datetime 
-    
+
+class CustomerSignupResponseModel(BaseModel):
+    Email: EmailStr 
+    FirstName: str 
+    LastName: str     
