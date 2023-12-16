@@ -92,7 +92,7 @@ def process():
             'sink.max-retries' = '10'
         );
     """
-    source_table =t_env.execute_sql(source_ddl)
+    source_table = t_env.execute_sql(source_ddl)
     sink_table = t_env.execute_sql(sink_ddl)
     t_env.from_path('ImproveSource').select(
         F.col('ImproveId'),

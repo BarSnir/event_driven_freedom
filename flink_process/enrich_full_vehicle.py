@@ -179,8 +179,9 @@ def log_processing():
       .in_streaming_mode().build()
     t_env = TableEnvironment.create(env_settings)
     t_env.get_config().set('pipeline.jars',get_jars_full_path()) \
-    .set("parallelism.default", get_env('PARALLELISM', '1')) \
-    .set("table.display.max-column-width", '2000')
+    .set("parallelism.default", "1") \
+    .set("table.display.max-column-width", '2000') \
+    .set('table.exec.sink.not-null-enforcer', 'DROP')
 
 
     ddl_list = [
@@ -209,9 +210,9 @@ def log_processing():
     .rename_columns(F.col('ImproveId').alias('improve_id_right'))
 
     vehicles_table = vehicles_table \
-    .join(mark_info_table).where(F.col('MarketInfoId') == F.col('market_info_id_right')) \
-    .join(media_types_table).where(F.col('MediaTypeId') == F.col('media_type_id_right')) \
-    .join(improves_table).where(F.col('ImproveId') == F.col('improve_id_right')) \
+    .full_outer_join(mark_info_table, F.col('MarketInfoId') == F.col('market_info_id_right')) \
+    .full_outer_join(media_types_table, F.col('MediaTypeId') == F.col('media_type_id_right')) \
+    .full_outer_join(improves_table, F.col('ImproveId') == F.col('improve_id_right')) \
     .drop_columns(
         F.col('market_info_id_right'),
         F.col('media_type_id_right'), 

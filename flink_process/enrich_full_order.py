@@ -127,8 +127,9 @@ def log_processing():
       .in_streaming_mode().build()
     t_env = TableEnvironment.create(env_settings)
     t_env.get_config().set('pipeline.jars',get_jars_full_path()) \
-    .set("parallelism.default", get_env('PARALLELISM', '1')) \
-    .set("table.display.max-column-width", '2000')
+    .set("parallelism.default", "1") \
+    .set("table.display.max-column-width", '2000') \
+    .set('table.exec.sink.not-null-enforcer', 'DROP')
 
     t_env.execute_sql(kafka_orders_ddl)
     t_env.execute_sql(kafka_images_ddl)
@@ -151,7 +152,7 @@ def log_processing():
         F.col('SuspendedReasonText').alias('suspended_reason_text'),
         F.col('AuthTypeId').alias('auth_type_id')
     )
-    full_order = order_table.join(images_table).where(F.col('OrderId') == F.col('images_order_id')) \
+    full_order = order_table.full_outer_join(images_table, F.col('OrderId') == F.col('images_order_id')) \
     .drop_columns(F.col('images_order_id')) \
     .select(
        F.col('OrderId').alias('order_id'),

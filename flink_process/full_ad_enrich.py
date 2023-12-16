@@ -181,8 +181,9 @@ def log_processing():
       .in_streaming_mode().build()
     t_env = TableEnvironment.create(env_settings)
     t_env.get_config().set('pipeline.jars',get_jars_full_path()) \
-    .set("parallelism.default", get_env('PARALLELISM', '1')) \
-    .set("table.display.max-column-width", '2000')
+    .set("parallelism.default", "1") \
+    .set("table.display.max-column-width", '2000') \
+    .set('table.exec.sink.not-null-enforcer', 'DROP')
 
     ddl_list = [
        kafka_full_orders_ddl, 
@@ -196,8 +197,7 @@ def log_processing():
     full_orders_table = t_env.from_path('full_orders')
     full_vehicles_table = t_env.from_path('full_vehicles')
     full_orders_table \
-    .join(full_vehicles_table) \
-    .where(F.col('order_id') == F.col('vehicle_order_id')) \
+    .full_outer_join(full_vehicles_table, F.col('order_id') == F.col('vehicle_order_id')) \
     .drop_columns(F.col('vehicle_order_id')) \
     .execute_insert('full_ads').wait()
     

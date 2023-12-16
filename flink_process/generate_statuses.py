@@ -64,7 +64,7 @@ def process():
             'table-name' = 'Statuses',
             'username'='root',
             'password'='password',
-            'sink.parallelism' = '1',
+            'sink.parallelism' = '',
             'sink.buffer-flush.interval' = '0',
             'sink.buffer-flush.max-rows' = '10',
             'sink.max-retries' = '10'

@@ -1,5 +1,5 @@
 import os
-from pyflink.table import TableEnvironment, EnvironmentSettings
+from pyflink.table import StreamTableEnvironment, EnvironmentSettings
 from pyflink.table import expressions as F 
 from pyflink.table.expression import DataTypes
 
@@ -59,15 +59,16 @@ def log_processing():
             'properties.auto.register.schemas'= 'true',
             'properties.use.latest.version'= 'true',
             'properties.max.block.ms' = '600000',
-            'sink.buffer-flush.interval' = '60000',
-            'sink.buffer-flush.max-rows' = '100000000'
+            'sink.buffer-flush.interval' = '10000',
+            'sink.buffer-flush.max-rows' = '220000'
         )
     """
-    env_settings = EnvironmentSettings.new_instance() \
-      .in_streaming_mode().build()
-    t_env = TableEnvironment.create(env_settings)
+
+    env_settings = EnvironmentSettings.new_instance().in_streaming_mode().build()
+    t_env = StreamTableEnvironment.create(environment_settings=env_settings)
+    t_env.get_config().get_configuration().set_integer("parallelism.default", 1)
+    t_env.get_config().get_configuration().set_boolean("pipeline.operator-chaining.chain-operators-with-different-max-parallelism", False)
     t_env.get_config().set('pipeline.jars',get_jars_full_path()) \
-    .set("parallelism.default", get_env('PARALLELISM', '1')) \
     .set("table.display.max-column-width", '2000')
 
     t_env.execute_sql(kafka_images_ddl)

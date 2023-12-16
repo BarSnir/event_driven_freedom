@@ -3,10 +3,10 @@ echo 'Step D || Starting Full enrich, take a look at control center at http://lo
 
 # Yes the order is necessary :)
 declare -a pyflink_scripts=(
-    [1]="aggregate_images"
+    # [1]="aggregate_images"
     [2]="enrich_full_order"
-    [3]="enrich_full_vehicle"
-    [4]="full_ad_enrich"
+    # [3]="enrich_full_vehicle"
+    # [4]="full_ad_enrich"
 )
 
 for key in "${!pyflink_scripts[@]}"; do
@@ -19,5 +19,5 @@ for key in "${!pyflink_scripts[@]}"; do
         -pyfs file:///opt/flink/ops/ \
         -py /opt/flink/ops/${pyflink_scripts[$key]}.py &
     echo The job ${pyflink_scripts[$key]} is runnig!
-    sleep 120;
+    sleep 60;
 done
