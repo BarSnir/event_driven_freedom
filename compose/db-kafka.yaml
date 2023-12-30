@@ -18,6 +18,8 @@ services:
       - '3306'
     volumes:
       - my-db:/var/lib/mysql
+    networks:
+      - ingest-network
   zookeeper:
     image: confluentinc/cp-zookeeper:6.2.0
     container_name: zookeeper
@@ -156,3 +158,6 @@ services:
         /etc/confluent/docker/run
 volumes:
   my-db:
+networks:
+  ingest-network:
+    driver: bridge

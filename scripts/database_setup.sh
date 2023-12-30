@@ -4,7 +4,8 @@ sleep 30
 python3 /opt/flink/project/main.py
 
 echo 'Step B || Generating datasets in 20s with Flink batch opersions!'
-echo 'Invited to take a look at job statuses at http://localhost:8081'
+echo Invited to take a look at job statuses at ${FLINK_BATCH_CLUSTER_HOST}:${FLINK_BATCH_CLUSTER_PORT}
+
 # Yes the order is necessary :)
 declare -a pyflink_scripts=(
     [1]="generate_market_info"
@@ -21,10 +22,11 @@ declare -a pyflink_scripts=(
 for key in "${!pyflink_scripts[@]}"; do
     echo Job ${pyflink_scripts[$key]} Is Running! $key out of ${#pyflink_scripts[@]}.
     ./bin/flink run \
-      --jobmanager localhost:4040 \
+      --detached \
+      --jobmanager ${FLINK_BATCH_CLUSTER_HOST}:${FLINK_BATCH_CLUSTER_PORT} \
       -pyclientexec /usr/local/bin/python3 \
       -pyexec /usr/local/bin/python3 \
-      -py /opt/flink/ops/${pyflink_scripts[$key]}.py &>/dev/null
+      -py /opt/flink/ops/${pyflink_scripts[$key]}.py
     echo The job ${pyflink_scripts[$key]} is Done!;
 done
 

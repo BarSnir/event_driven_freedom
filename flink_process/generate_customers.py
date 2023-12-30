@@ -105,7 +105,7 @@ def process():
             PRIMARY KEY (CustomerId) NOT ENFORCED
         ) WITH (
             'connector' = 'jdbc',
-            'url' = 'jdbc:mysql://localhost:3306/production',
+            'url' = 'jdbc:mysql://db:3306/production',
             'table-name' = 'Orders',
             'username'='root',
             'password'='password',
@@ -129,7 +129,7 @@ def process():
             PRIMARY KEY (CustomerId) NOT ENFORCED
         ) WITH (
             'connector' = 'jdbc',
-            'url' = 'jdbc:mysql://localhost:3306/production',
+            'url' = 'jdbc:mysql://db:3306/production',
             'table-name' = 'Customers',
             'username'='root',
             'password'='password',
