@@ -1,0 +1,41 @@
+version: "3"
+services:
+  flink-batch-jobmanager:
+    platform: linux/amd64
+    container_name: flink-batch-jobmanager
+    image: barsnir/pyflink:v1
+    ports:
+      - "4040:4040"
+    command: jobmanager
+    attach: false
+    restart: always
+    volumes:
+      - ../datasets:/opt/flink/datasets
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.memory.process.size: 1000m
+        jobmanager.rpc.address: flink-batch-jobmanager
+        rest.port: 4040
+        rest.address: localhost
+  flink-batch-taskmanager:
+    platform: linux/amd64
+    container_name: flink-batch-taskmanager
+    image: barsnir/pyflink:v1
+    attach: false
+    restart: always
+    command: taskmanager
+    volumes:
+      - ../datasets:/opt/flink/datasets
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: flink-batch-jobmanager
+        taskmanager.numberOfTaskSlots: 1
+        parallelism.default: 1
+        taskmanager.memory.process.size: 6000m
+        taskmanager.memory.jvm-metaspace.size: 1000m
+        taskmanager.memory.managed.size: 100m
+        restart-strategy.type: fixed-delay
+        restart-strategy.fixed-delay.attempts: 3
+        restart-strategy.fixed-delay.delay: 3 m

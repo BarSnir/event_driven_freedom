@@ -47,7 +47,7 @@ def process():
             PRIMARY KEY (AuthTypeID) NOT ENFORCED
         ) WITH (
             'connector' = 'jdbc',
-            'url' = 'jdbc:mysql://db:3306/production',
+            'url' = 'jdbc:mysql://localhost:3306/production',
             'table-name' = 'AuthTypes',
             'username'='root',
             'password'='password',

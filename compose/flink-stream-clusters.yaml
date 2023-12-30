@@ -1,0 +1,138 @@
+version: "3"
+services:
+  flink-jobmanager-a:
+    container_name: flink-jobmanager-a
+    platform: linux/amd64
+    image: barsnir/pyflink:v1
+    ports:
+      - "4041:4041"
+    command: jobmanager
+    attach: false
+    restart: always
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.memory.process.size: 1000m
+        jobmanager.rpc.address: flink-jobmanager-a
+        rest.port: 4041
+        rest.address: localhost
+  flink-taskmanager-a:
+    platform: linux/amd64
+    container_name: flink-taskmanager-a
+    image: barsnir/pyflink:v1
+    command: taskmanager
+    attach: false
+    restart: always
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: flink-jobmanager-a
+        parallelism.default: 1
+        taskmanager.numberOfTaskSlots: 4
+        taskmanager.memory.process.size: 2000m
+        taskmanager.memory.jvm-metaspace.size: 100m
+        restart-strategy.type: fixed-delay
+        restart-strategy.fixed-delay.attempts: 3
+        restart-strategy.fixed-delay.delay: 3 m
+  flink-jobmanager-b:
+    platform: linux/amd64
+    image: barsnir/pyflink:v1
+    container_name: flink-jobmanager-b
+    ports:
+      - "4042:4042"
+    command: jobmanager
+    attach: false
+    restart: always
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.memory.process.size: 1000m
+        jobmanager.rpc.address: flink-jobmanager-b
+        rest.port: 4042
+        rest.address: localhost
+  flink-taskmanager-b:
+    platform: linux/amd64
+    container_name: flink-taskmanager-b
+    image: barsnir/pyflink:v1
+    command: taskmanager
+    attach: false
+    restart: always
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: flink-jobmanager-b
+        parallelism.default: 1
+        taskmanager.numberOfTaskSlots: 4
+        taskmanager.memory.process.size: 2000m
+        taskmanager.memory.jvm-metaspace.size: 100m
+        restart-strategy.type: fixed-delay
+        restart-strategy.fixed-delay.attempts: 3
+        restart-strategy.fixed-delay.delay: 3 m
+  flink-jobmanager-c:
+    platform: linux/amd64
+    container_name: flink-jobmanager-c
+    image: barsnir/pyflink:v1
+    ports:
+      - "4043:4043"
+    command: jobmanager
+    attach: false
+    restart: always
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.memory.process.size: 1000m
+        jobmanager.rpc.address: flink-jobmanager-c
+        rest.port: 4043
+        rest.address: localhost
+  flink-taskmanager-c:
+    platform: linux/amd64
+    container_name: flink-taskmanager-c
+    image: barsnir/pyflink:v1
+    command: taskmanager
+    attach: false
+    restart: always
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: flink-jobmanager-c
+        parallelism.default: 1
+        taskmanager.numberOfTaskSlots: 4
+        taskmanager.memory.process.size: 2000m
+        taskmanager.memory.jvm-metaspace.size: 100m
+        restart-strategy.type: fixed-delay
+        restart-strategy.fixed-delay.attempts: 3
+        restart-strategy.fixed-delay.delay: 3 m
+  flink-jobmanager-d:
+    platform: linux/amd64
+    container_name: flink-jobmanager-d
+    image: barsnir/pyflink:v1
+    ports:
+      - "4044:4044"
+    command: jobmanager
+    attach: false
+    restart: always
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.memory.process.size: 1000m
+        jobmanager.rpc.address: flink-jobmanager-d
+        rest.port: 4044
+        rest.address: localhost
+  flink-taskmanager-d:
+    platform: linux/amd64
+    container_name: flink-taskmanager-d
+    image: barsnir/pyflink:v1
+    command: taskmanager
+    attach: false
+    restart: always
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: flink-jobmanager-d
+        parallelism.default: 1
+        taskmanager.numberOfTaskSlots: 4
+        taskmanager.memory.process.size: 2000m
+        taskmanager.memory.jvm-metaspace.size: 100m
+        restart-strategy.type: fixed-delay
+        restart-strategy.fixed-delay.attempts: 3
+        restart-strategy.fixed-delay.delay: 3 m

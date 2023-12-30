@@ -1,6 +1,6 @@
 # !/bin/bash
 echo "Pre step - Please prefrom chmod +x /var/run/docker.sock"
-# bash $SCRIPTS_PATH_DIR/database_setup.sh
+bash $SCRIPTS_PATH_DIR/database_setup.sh
 # echo 'Step C || Setup Debezium connector & fetching Data...'
 # python3 /opt/flink/project/scripts/restart_taksmanager.py
 # curl --location --request PUT 'http://kafka-connect:8083/connectors/debezium_pyflink_v1/config' \

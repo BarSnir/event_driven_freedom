@@ -21,7 +21,7 @@ declare -a pyflink_scripts=(
 for key in "${!pyflink_scripts[@]}"; do
     echo Job ${pyflink_scripts[$key]} Is Running! $key out of ${#pyflink_scripts[@]}.
     ./bin/flink run \
-      --jobmanager jobmanager:8081 \
+      --jobmanager localhost:4040 \
       -pyclientexec /usr/local/bin/python3 \
       -pyexec /usr/local/bin/python3 \
       -py /opt/flink/ops/${pyflink_scripts[$key]}.py &>/dev/null
