@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <title>Document</title>
+  </head>
+  <body>
+    <header>
+      <h1>Event Driven Freedom</h1>
+    </header>
+	<p>Click the button to change the text color!</p>
+	<button id="color-button">Change Color</button>
+	<script>
+		$(document).ready(function() {
+			$('#color-button').click(function() {
+				$('body').css('color', 'red');
+			});
+		});
+	</script>
+  </body>
+</html>

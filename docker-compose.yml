@@ -1,23 +1,22 @@
 services:
-  server-legacy:
-    container_name: legacy-server
-    build: ./backend/legacy
-    links:
-      - db
+  client-modern:
+    container_name: modern-client
+    build:
+      context: ./client/modern/e_d_f
+      dockerfile: Dockerfile
+    volumes:
+      - ".:/app"
+      - "/app/node_modules"
     ports:
-      - "5000:5000"
-    depends_on:
-      - db
-  server-modern:
-    container_name: modern-server
-    platform: linux/x86_64
-    build: ./backend/modern
-    links:
-      - db
+      - "5173:80"
+
+  client-legacy:
+    container_name: legacy-client
+    build:
+      context: ./client/legacy
+      dockerfile: Dockerfile
     ports:
-      - "80:80"
-    depends_on:
-      - db
+      - "5050:5050"
   db:
     container_name: legacy-mysql
     image: mysql:5.7
@@ -26,14 +25,14 @@ services:
     attach: false
     command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW --server-id=1
     environment:
-      MYSQL_DATABASE: 'db'
-      MYSQL_USER: 'user'
-      MYSQL_PASSWORD: 'password'
-      MYSQL_ROOT_PASSWORD: 'password'
+      MYSQL_DATABASE: "db"
+      MYSQL_USER: "user"
+      MYSQL_PASSWORD: "password"
+      MYSQL_ROOT_PASSWORD: "password"
     ports:
-      - '3306:3306'
+      - "3306:3306"
     expose:
-      - '3306'
+      - "3306"
     volumes:
       - my-db:/var/lib/mysql
   # zookeeper:
@@ -132,7 +131,7 @@ services:
   #     CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: "1"
   #     CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: "1"
   #     CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: "1"
-  #   command: > 
+  #   command: >
   #     bash -c " echo Installing Debezium && \
   #     confluent-hub install --no-prompt debezium/debezium-connector-mysql:1.7.0 && \
   #     echo 'Launching Kafka Connect worker' && \
@@ -167,11 +166,11 @@ services:
   #     CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_PARTITIONS: 1
   #     CONTROL_CENTER_STREAMS_NUM_STREAM_THREADS: 1
   #     CONTROL_CENTER_STREAMS_CACHE_MAX_BYTES_BUFFERING: 104857600
-    # command:
-    #   - bash
-    #   - -c 
-    #   - |
-    #     /etc/confluent/docker/run
+  # command:
+  #   - bash
+  #   - -c
+  #   - |
+  #     /etc/confluent/docker/run
   jobmanager:
     container_name: jobmanager
     platform: linux/arm64/v8
@@ -223,7 +222,7 @@ services:
       context: ./images/pyflink
       dockerfile: .Dockerfile
     depends_on:
-    - taskmanager
+      - taskmanager
     command: >
       bash -c  "chmod +x ./project && chmod +x ./project/scripts/steps.sh && \
       ./project/scripts/steps.sh"
