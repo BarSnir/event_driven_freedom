@@ -118,41 +118,41 @@ services:
       confluent-hub install --no-prompt debezium/debezium-connector-mysql:1.7.0 && \
       echo 'Launching Kafka Connect worker' && \
       /etc/confluent/docker/run"
-  control-center-a:
-    image: confluentinc/cp-enterprise-control-center:6.2.0
-    container_name: control-center-a
-    platform: linux/amd64
-    restart: always
-    attach: false
-    depends_on:
-      kafka-connect:
-        condition: service_healthy
-    healthcheck:
-      test: curl http://localhost:9021/ || exit 1
-      start_period: 3m
-      interval: 30s
-      timeout: 10s
-      retries: 1
-    ports:
-      - "9021:9021"
-    environment:
-      CONTROL_CENTER_BOOTSTRAP_SERVERS: 'broker:29092'
-      CONTROL_CENTER_CONNECT_CONNECT_CLUSTER: 'kafka-connect:8083'
-      CONTROL_CENTER_SCHEMA_REGISTRY_URL: "http://schema-registry:8082"
-      CONFLUENT_METRICS_TOPIC_REPLICATION: 1
-      CONTROL_CENTER_REPLICATION_FACTOR: 1
-      CONTROL_CENTER_COMMAND_TOPIC_REPLICATION: 1
-      CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_REPLICATION: 1
-      CONTROL_CENTER_INTERNAL_TOPICS_PARTITIONS: 1
-      CONTROL_CENTER_INTERNAL_TOPICS_REPLICATION: 1
-      CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_PARTITIONS: 1
-      CONTROL_CENTER_STREAMS_NUM_STREAM_THREADS: 1
-      CONTROL_CENTER_STREAMS_CACHE_MAX_BYTES_BUFFERING: 104857600
-    command:
-      - bash
-      - -c 
-      - |
-        /etc/confluent/docker/run
+  # control-center-a:
+  #   image: confluentinc/cp-enterprise-control-center:6.2.0
+  #   container_name: control-center-a
+  #   platform: linux/amd64
+  #   restart: always
+  #   attach: false
+  #   depends_on:
+  #     kafka-connect:
+  #       condition: service_healthy
+  #   healthcheck:
+  #     test: curl http://localhost:9021/ || exit 1
+  #     start_period: 3m
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 1
+  #   ports:
+  #     - "9021:9021"
+  #   environment:
+  #     CONTROL_CENTER_BOOTSTRAP_SERVERS: 'broker:29092'
+  #     CONTROL_CENTER_CONNECT_CONNECT_CLUSTER: 'kafka-connect:8083'
+  #     CONTROL_CENTER_SCHEMA_REGISTRY_URL: "http://schema-registry:8082"
+  #     CONFLUENT_METRICS_TOPIC_REPLICATION: 1
+  #     CONTROL_CENTER_REPLICATION_FACTOR: 1
+  #     CONTROL_CENTER_COMMAND_TOPIC_REPLICATION: 1
+  #     CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_REPLICATION: 1
+  #     CONTROL_CENTER_INTERNAL_TOPICS_PARTITIONS: 1
+  #     CONTROL_CENTER_INTERNAL_TOPICS_REPLICATION: 1
+  #     CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_PARTITIONS: 1
+  #     CONTROL_CENTER_STREAMS_NUM_STREAM_THREADS: 1
+  #     CONTROL_CENTER_STREAMS_CACHE_MAX_BYTES_BUFFERING: 104857600
+  #   command:
+  #     - bash
+  #     - -c 
+  #     - |
+  #       /etc/confluent/docker/run
   jobmanager:
     container_name: jobmanager
     platform: linux/arm64/v8
@@ -203,9 +203,9 @@ services:
     build:
       context: ./images/pyflink
       dockerfile: .Dockerfile
-    depends_on:
-      control-center-a:
-        condition: service_healthy
+    # depends_on:
+    #   control-center-a:
+    #     condition: service_healthy
     command: >
       bash -c  "chmod +x ./project && chmod +x ./project/scripts/steps.sh && \
       ./project/scripts/steps.sh"

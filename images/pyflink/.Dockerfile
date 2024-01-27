@@ -1,20 +1,10 @@
+FROM apache/flink:1.17.2
 
-FROM apache/flink:1.17.1
 
-# The liblzma-dev is important to apache beam runtime
+# install python3 and pip3
 RUN apt-get update -y && \
-apt-get install -y build-essential liblzma-dev libssl-dev zlib1g-dev libbz2-dev libffi-dev && \
-wget https://www.python.org/ftp/python/3.9.7/Python-3.9.7.tgz && \
-tar -xvf Python-3.9.7.tgz && \
-cd Python-3.9.7 && \
-./configure --without-tests --enable-shared && \
-make -j6 && \
-make install && \
-ldconfig /usr/local/lib && \
-cd .. && rm -f Python-3.9.7.tgz && rm -rf Python-3.9.7 && \
-ln -s /usr/local/bin/python3 /usr/local/bin/python && \
-apt-get clean && \
-rm -rf /var/lib/apt/lists/*
+apt-get install -y python3 python3-pip python3-dev && rm -rf /var/lib/apt/lists/*
+RUN ln -s /usr/bin/python3 /usr/bin/python
 
 # install PyFlink & dependencies
 COPY ./requirements.txt ./requirements.txt

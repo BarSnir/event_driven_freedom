@@ -21,10 +21,11 @@ declare -a pyflink_scripts=(
 for key in "${!pyflink_scripts[@]}"; do
     echo Job ${pyflink_scripts[$key]} Is Running! $key out of 9.
     ./bin/flink run \
+      --detached \
       --jobmanager jobmanager:8081 \
-      -pyclientexec /usr/local/bin/python3 \
-      -pyexec /usr/local/bin/python3 \
-      -py /opt/flink/ops/${pyflink_scripts[$key]}.py &>/dev/null
+      -pyclientexec /usr/bin/python \
+      -pyexec /usr/bin/python \
+      -py /opt/flink/ops/generate_vehicles.py
     echo The job ${pyflink_scripts[$key]} is Done! ;
 done
 
