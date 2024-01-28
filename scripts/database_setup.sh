@@ -25,7 +25,7 @@ for key in "${!pyflink_scripts[@]}"; do
       --jobmanager jobmanager:8081 \
       -pyclientexec /usr/bin/python \
       -pyexec /usr/bin/python \
-      -py /opt/flink/ops/${pyflink_scripts[$key]}.py
+      -py /opt/flink/ops/${pyflink_scripts[$key]}.py &>/dev/null
     echo The job ${pyflink_scripts[$key]} is Done! ;
 done
 

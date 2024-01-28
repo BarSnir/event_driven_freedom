@@ -1,0 +1,30 @@
+{
+    "batch": {
+        "host": "jobmanager",
+        "port:": "8081",
+        "process_list": [
+            "generate_market_info",
+            "generate_vehicles",
+            "generate_orders",
+            "generate_images",
+            "generate_customers",
+            "generate_auth_types",
+            "generate_improves",
+            "generate_media_type",
+            "generate_statuses"
+        ],
+        "process_command": [
+            "./bin/flink",
+            "run",
+            "--detached",
+            "--jobmanager",
+            "jobmanager:8081",
+            "-pyclientexec",
+            "/usr/bin/python",
+            "-pyexec",
+            "/usr/bin/python",
+            "-py",
+            "/opt/flink/ops"
+        ]
+    }
+}

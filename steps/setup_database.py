@@ -1,7 +1,7 @@
 from libs.connectors.mysql import MySqlConnector
 from libs.utils.logger import ColorLogger
 
-MODULE_MESSAGE = 'Step A | Starting to setup MySQL database'
+MODULE_MESSAGE = 'Step A || Creating databases & tables'
 LOGGER_NAME = 'mysql_setup'
 
 def process():

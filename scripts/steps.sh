@@ -61,6 +61,8 @@ curl --location --request PUT 'http://kafka-connect:8083/connectors/debezium_pyf
     "connect.meta.data": "false"
 }' &>/dev/null
 wait
+docker-compose down jobmanager taskamanger
+docker-compose up -f compose-streaming-cluster.yml -d
 echo "Waiting for Debeizuim connector task to be done." 
 x=1
 while [ $x -le 120 ]

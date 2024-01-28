@@ -198,6 +198,7 @@ services:
       - DB_PASSWORD=password
       - ENV=development
       - DB_CONFIG=/opt/flink/project/configs/database.json
+      - PROCESS_CONFIG_PATH=/opt/flink/project/configs/process_config.json
       - SCRIPTS_PATH_DIR=/opt/flink/project/scripts
     volumes:
       - ./flink_process:/opt/flink/ops
