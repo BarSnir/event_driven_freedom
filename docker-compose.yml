@@ -189,8 +189,7 @@ services:
       context: ./images/pyflink
       dockerfile: .Dockerfile
     command: >
-      bash -c  "chmod +x ./project && chmod +x ./project/scripts/steps.sh && \
-      ./project/scripts/steps.sh"
+      bash -c  "project/"
     environment:
       - DATABASE=production
       - DB_HOST=db
