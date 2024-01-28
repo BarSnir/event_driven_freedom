@@ -117,28 +117,25 @@ services:
       - ./connectors:/data/connectors/
     command: > 
       bash -c "/etc/confluent/docker/run"
-  conduktor-console:
-    image: conduktor/conduktor-platform:1.18.1
+  control-center:
+    image: confluentinc/cp-enterprise-control-center:7.5.3
+    hostname: control-center
+    container_name: control-center
+    attach: false
     depends_on:
       kafka-connect:
         condition: service_healthy
-    hostname: conduktor-console
-    container_name: conduktor-console
     ports:
-      - "8080:8080"
-    volumes:
-      - type: bind
-        source: "./platform-config.yml"
-        target: /opt/conduktor/platform-config.yaml
-        read_only: true
+      - "9021:9021"
     environment:
-      CDK_IN_CONF_FILE: /opt/conduktor/platform-config.yaml
-  conduktor-monitoring:
-    hostname: conduktor-monitoring
-    container_name: conduktor-monitoring
-    image: conduktor/conduktor-platform-cortex:1.18.1
-    environment:
-      CDK_CONSOLE-URL: "http://conduktor-console:8080"
+      CONTROL_CENTER_BOOTSTRAP_SERVERS: 'broker:29092'
+      CONTROL_CENTER_CONNECT_CONNECT-DEFAULT_CLUSTER: 'kafka-connect:8083'
+      CONTROL_CENTER_SCHEMA_REGISTRY_URL: "http://schema-registry:8082"
+      CONTROL_CENTER_REPLICATION_FACTOR: 1
+      CONTROL_CENTER_INTERNAL_TOPICS_PARTITIONS: 1
+      CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_PARTITIONS: 1
+      CONFLUENT_METRICS_TOPIC_REPLICATION: 1
+      PORT: 9021
   jobmanager:
     container_name: jobmanager
     platform: linux/arm64/v8
@@ -177,17 +174,17 @@ services:
         jobmanager.rpc.address: jobmanager
         taskmanager.numberOfTaskSlots: 8
         parallelism.default: 8
-        taskmanager.memory.process.size: 7500m
+        taskmanager.memory.process.size: 8500m
         taskmanager.memory.framework.off-heap.size: 500m
         taskmanager.memory.task.off-heap.size: 1000m
-        taskmanager.memory.jvm-metaspace.size: 1600m
+        taskmanager.memory.jvm-metaspace.size: 3000m
     links:
       - db:db
   pyflink-client:
     platform: linux/arm64/v8
     container_name: pyflink-client
     depends_on:
-      - conduktor-console
+      - control-center
     build:
       context: ./images/pyflink
       dockerfile: .Dockerfile
