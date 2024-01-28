@@ -18,13 +18,14 @@ services:
     volumes:
       - my-db:/var/lib/mysql
   zookeeper:
-    image: confluentinc/cp-zookeeper:6.2.0
+    image: confluentinc/cp-zookeeper:7.5.3
     container_name: zookeeper
     platform: linux/amd64
     restart: always
     attach: false
     healthcheck:
       test: echo 'ruok' | nc -w 2 localhost 2181 | grep imok
+      start_period: 50s
       timeout: 10s
       retries: 5
       interval: 30s
@@ -33,7 +34,7 @@ services:
       ZOOKEEPER_TICK_TIME: 2000
       KAFKA_OPTS: -Dzookeeper.4lw.commands.whitelist=ruok
   broker:
-    image: confluentinc/cp-kafka:6.2.0
+    image: confluentinc/cp-kafka:7.5.3
     container_name: broker
     platform: linux/amd64
     attach: false
@@ -56,12 +57,10 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:29092,PLAINTEXT_HOST://localhost:9092
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 100
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
   schema-registry:
-    image: confluentinc/cp-schema-registry:6.2.0
+    image: confluentinc/cp-schema-registry:7.5.3
     container_name: schema-registry
     platform: linux/amd64
     attach: false
@@ -71,7 +70,7 @@ services:
         condition: service_healthy
     healthcheck:
       test: curl --output /dev/null --silent --head --fail http://schema-registry:8082/subjects
-      start_period: 5m
+      start_period: 2m
       interval: 30s
       timeout: 10s
       retries: 10
@@ -82,7 +81,7 @@ services:
       SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: broker:29092
       SCHEMA_REGISTRY_LISTENERS: http://schema-registry:8082
   kafka-connect:
-    image: confluentinc/cp-kafka-connect-base:6.2.0
+    image: confluentinc/cp-kafka-connect:7.5.3
     container_name: kafka-connect
     platform: linux/amd64
     attach: false
@@ -94,7 +93,7 @@ services:
       - 8083:8083
     healthcheck:
       test: curl http://kafka-connect:8083/ || exit 1
-      start_period: 3m
+      start_period: 4m
       interval: 30s
       timeout: 10s
       retries: 1
@@ -113,46 +112,33 @@ services:
       CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: "1"
       CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: "1"
       CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: "1"
+      CONNECT_PLUGIN_PATH: '/usr/share/java,/data/connectors/'
+    volumes:
+      - ./connectors:/data/connectors/
     command: > 
-      bash -c " echo Installing Debezium && \
-      confluent-hub install --no-prompt debezium/debezium-connector-mysql:1.7.0 && \
-      echo 'Launching Kafka Connect worker' && \
-      /etc/confluent/docker/run"
-  # control-center-a:
-  #   image: confluentinc/cp-enterprise-control-center:6.2.0
-  #   container_name: control-center-a
-  #   platform: linux/amd64
-  #   restart: always
-  #   attach: false
-  #   depends_on:
-  #     kafka-connect:
-  #       condition: service_healthy
-  #   healthcheck:
-  #     test: curl http://localhost:9021/ || exit 1
-  #     start_period: 3m
-  #     interval: 30s
-  #     timeout: 10s
-  #     retries: 1
-  #   ports:
-  #     - "9021:9021"
-  #   environment:
-  #     CONTROL_CENTER_BOOTSTRAP_SERVERS: 'broker:29092'
-  #     CONTROL_CENTER_CONNECT_CONNECT_CLUSTER: 'kafka-connect:8083'
-  #     CONTROL_CENTER_SCHEMA_REGISTRY_URL: "http://schema-registry:8082"
-  #     CONFLUENT_METRICS_TOPIC_REPLICATION: 1
-  #     CONTROL_CENTER_REPLICATION_FACTOR: 1
-  #     CONTROL_CENTER_COMMAND_TOPIC_REPLICATION: 1
-  #     CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_REPLICATION: 1
-  #     CONTROL_CENTER_INTERNAL_TOPICS_PARTITIONS: 1
-  #     CONTROL_CENTER_INTERNAL_TOPICS_REPLICATION: 1
-  #     CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_PARTITIONS: 1
-  #     CONTROL_CENTER_STREAMS_NUM_STREAM_THREADS: 1
-  #     CONTROL_CENTER_STREAMS_CACHE_MAX_BYTES_BUFFERING: 104857600
-  #   command:
-  #     - bash
-  #     - -c 
-  #     - |
-  #       /etc/confluent/docker/run
+      bash -c "/etc/confluent/docker/run"
+  conduktor-console:
+    image: conduktor/conduktor-platform:1.18.1
+    depends_on:
+      kafka-connect:
+        condition: service_healthy
+    hostname: conduktor-console
+    container_name: conduktor-console
+    ports:
+      - "8080:8080"
+    volumes:
+      - type: bind
+        source: "./platform-config.yml"
+        target: /opt/conduktor/platform-config.yaml
+        read_only: true
+    environment:
+      CDK_IN_CONF_FILE: /opt/conduktor/platform-config.yaml
+  conduktor-monitoring:
+    hostname: conduktor-monitoring
+    container_name: conduktor-monitoring
+    image: conduktor/conduktor-platform-cortex:1.18.1
+    environment:
+      CDK_CONSOLE-URL: "http://conduktor-console:8080"
   jobmanager:
     container_name: jobmanager
     platform: linux/arm64/v8
@@ -194,18 +180,17 @@ services:
         taskmanager.memory.process.size: 7500m
         taskmanager.memory.framework.off-heap.size: 500m
         taskmanager.memory.task.off-heap.size: 1000m
-        taskmanager.memory.jvm-metaspace.size: 600m
+        taskmanager.memory.jvm-metaspace.size: 1600m
     links:
       - db:db
   pyflink-client:
     platform: linux/arm64/v8
     container_name: pyflink-client
+    depends_on:
+      - conduktor-console
     build:
       context: ./images/pyflink
       dockerfile: .Dockerfile
-    # depends_on:
-    #   control-center-a:
-    #     condition: service_healthy
     command: >
       bash -c  "chmod +x ./project && chmod +x ./project/scripts/steps.sh && \
       ./project/scripts/steps.sh"
