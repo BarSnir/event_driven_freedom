@@ -189,7 +189,7 @@ services:
       context: ./images/pyflink
       dockerfile: .Dockerfile
     command: >
-      bash -c  "project/"
+      bash -c  "sleep 60 && python ./project/main.py"
     environment:
       - DATABASE=production
       - DB_HOST=db
@@ -204,6 +204,7 @@ services:
       - ./jars:/opt/flink/opt
       - ./datasets:/opt/flink/datasets
       - .:/opt/flink/project
+      - /var/run/docker.sock:/var/run/docker.sock
     scale: 1
 volumes:
   my-db:

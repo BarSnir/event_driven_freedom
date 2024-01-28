@@ -1,4 +1,4 @@
-import json, os, subprocess, docker
+import json, os, subprocess, docker, time
 from libs.utils.logger import ColorLogger
 
 MODULE_MESSAGE = 'Step B || Generating datasets in 20s with Flink batch operations!'
@@ -22,7 +22,11 @@ def process():
                 command_list = process_config.get('process_command')
                 command_list[len(command_list) - 1] = process_file_path
                 logger.info(f"Running {process}, {process_counter} out {process_sum}.")
-                subprocess.Popen(command_list)
+                subprocess.Popen(
+                    command_list, 
+                    stdout=subprocess.PIPE,
+                    shell=True
+                ).wait()
                 logger.info(f"Done!")
     except IOError as ioe:
         logger.error("IO exception with trace:")
