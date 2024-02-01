@@ -1,11 +1,9 @@
 from libs.connectors.mysql import MySqlConnector
-from libs.utils.logger import ColorLogger
 
 MODULE_MESSAGE = 'Step A || Creating databases & tables'
 LOGGER_NAME = 'mysql_setup'
 
-def process():
-    logger = ColorLogger(LOGGER_NAME).get_logger()
+def process(logger):
     logger.info(MODULE_MESSAGE)
     mysql_connector = MySqlConnector(logger)
     mysql_connector.create_database()

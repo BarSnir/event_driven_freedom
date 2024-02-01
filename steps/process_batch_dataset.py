@@ -1,32 +1,37 @@
-import json, os, subprocess, docker, time
-from libs.utils.logger import ColorLogger
+import json, os, subprocess
+from libs.utils.docker import DockerUtils
+from libs.utils.subprocess import SubprocessUtil
 
 MODULE_MESSAGE = 'Step B || Generating datasets in 20s with Flink batch operations!'
 LOGGER_NAME = 'dataset_ingest'
+DOCKER_ACCESS = '/var/run/docker.sock'
 
-def process():
-    logger = ColorLogger(LOGGER_NAME).get_logger()
-    docker_client = docker.DockerClient(base_url='unix://var/run/docker.sock')
+def process(logger):
     logger.info(MODULE_MESSAGE)
-    process_counter = 0
+    SubprocessUtil.allow_docker_access(DOCKER_ACCESS)
+    SubprocessUtil.allow_execute_pyflink_flies()
+    docker_util = DockerUtils(DOCKER_ACCESS)
     try:
         with open(f"{os.getenv('PROCESS_CONFIG_PATH')}") as process_config_file:
             process_config = json.load(process_config_file).get('batch')
             process_path = process_config.get('process_command')[
                 len(process_config.get('process_command')) - 1
             ]
-            process_sum = len(process_config.get('process_list'))
-            for process in process_config.get('process_list'):
-                process_counter += 1
+            process_list = process_config.get('process_list')
+            process_sum = len(process_list)
+            for process in process_list:
+                index = process_list.index(process) + 1
                 process_file_path =  f"{process_path}/{process}.py"
                 command_list = process_config.get('process_command')
                 command_list[len(command_list) - 1] = process_file_path
-                logger.info(f"Running {process}, {process_counter} out {process_sum}.")
-                subprocess.Popen(
+                logger.info(f"Running {process}, {index} out  of {process_sum}.")
+                logger.debug(command_list)
+                proc = subprocess.Popen(
                     command_list, 
-                    stdout=subprocess.PIPE,
-                    shell=True
-                ).wait()
+                    stdin=subprocess.DEVNULL, 
+                    stdout=subprocess.DEVNULL
+                )
+                proc.wait()
                 logger.info(f"Done!")
     except IOError as ioe:
         logger.error("IO exception with trace:")
@@ -39,8 +44,5 @@ def process():
         logger.exception(e)
     finally:
         logger.info("Shutting down flink batch cluster.")
-        jobmanager_container = docker_client.containers.get("jobmanager")
-        taskmanager_container = docker_client.containers.get("taskmanager")
-        jobmanager_container.stop()
-        taskmanager_container.stop()
-        docker_client.close()
+        docker_util.down_container("jobmanager")
+        docker_util.down_container("taskmanager")
