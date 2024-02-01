@@ -11,6 +11,5 @@ class DockerUtils:
             base_url=f'unix:/{self.connection_file_path}'
         )
 
-    def down_container(self, container_name):
-        container = self.docker_client.containers.get(container_name)
-        container.close()
+    def stop_container(self, container_name):
+        self.docker_client.containers.get(container_name).stop()

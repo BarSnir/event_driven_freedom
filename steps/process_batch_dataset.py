@@ -24,13 +24,9 @@ def process(logger):
                 process_file_path =  f"{process_path}/{process}.py"
                 command_list = process_config.get('process_command')
                 command_list[len(command_list) - 1] = process_file_path
-                logger.info(f"Running {process}, {index} out  of {process_sum}.")
+                logger.info(f"Running {process}, {index} out of {process_sum}.")
                 logger.debug(command_list)
-                proc = subprocess.Popen(
-                    command_list, 
-                    stdin=subprocess.DEVNULL, 
-                    stdout=subprocess.DEVNULL
-                )
+                proc = subprocess.Popen(command_list)
                 proc.wait()
                 logger.info(f"Done!")
     except IOError as ioe:
@@ -44,5 +40,5 @@ def process(logger):
         logger.exception(e)
     finally:
         logger.info("Shutting down flink batch cluster.")
-        docker_util.down_container("jobmanager")
-        docker_util.down_container("taskmanager")
+        docker_util.stop_container("jobmanager")
+        docker_util.stop_container("taskmanager")
