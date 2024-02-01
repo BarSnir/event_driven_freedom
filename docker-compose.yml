@@ -154,6 +154,8 @@ services:
         FLINK_PROPERTIES=
         jobmanager.rpc.address: jobmanager
         jobmanager.memory.process.size: 2000m
+        jobstore.max-capacity: 8
+        jobstore.type: file
   taskmanager:
     container_name: taskmanager
     platform: linux/arm64/v8
@@ -174,12 +176,14 @@ services:
         jobmanager.rpc.address: jobmanager
         taskmanager.numberOfTaskSlots: 8
         parallelism.default: 8
-        taskmanager.memory.process.size: 9200m
-        taskmanager.memory.flink.size: 5000m
+        taskmanager.memory.process.size: 10500m
+        taskmanager.memory.flink.size: 6000m
+        taskmanager.memory.task.heap.size: 500m
         taskmanager.memory.framework.off-heap.size: 500m
-        taskmanager.memory.framework.heap.size: 700m
+        taskmanager.memory.framework.heap.size: 1200m
         taskmanager.memory.task.off-heap.size: 1000m
         taskmanager.memory.jvm-metaspace.size: 4000m
+        akka.ask.timeout: 150 s
     links:
       - db:db
   pyflink-client:

@@ -8,7 +8,6 @@ DOCKER_ACCESS = '/var/run/docker.sock'
 
 def process(logger):
     logger.info(MODULE_MESSAGE)
-    SubprocessUtil.allow_docker_access(DOCKER_ACCESS)
     SubprocessUtil.allow_execute_pyflink_flies()
     docker_util = DockerUtils(DOCKER_ACCESS)
     try:

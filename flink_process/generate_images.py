@@ -50,7 +50,7 @@ def process():
         );
     """
     sink_ddl = """
-        CREATE TABLE MysqlSink (
+        CREATE TABLE ImagesTable (
             `ImageId` VARCHAR,
             `OrderId` VARCHAR,
             `Priority` INT,
@@ -62,18 +62,18 @@ def process():
             'table-name' = 'Images',
             'username'='root',
             'password'='password',
-            'sink.parallelism' = '2',
-            'sink.buffer-flush.interval' = '0',
-            'sink.buffer-flush.max-rows' = '10',
+            'sink.parallelism' = '3',
+            'sink.buffer-flush.interval' = '500',
+            'sink.buffer-flush.max-rows' = '10000',
             'sink.max-retries' = '10'
         );
     """
-    source_table =t_env.execute_sql(source_ddl)
-    sink_table = t_env.execute_sql(sink_ddl)
+    t_env.execute_sql(source_ddl)
+    t_env.execute_sql(sink_ddl)
     panda_table = t_env.from_path('MysqlSource').to_pandas()
     for item in panda_table.to_dict(orient='records'):
        order_id_list.append(item['OrderID'])
-
+    panda_table = []
     CONST_DATATYPE = DataTypes.ROW([
        DataTypes.FIELD("ImageId", DataTypes.STRING()),
        DataTypes.FIELD("OrderId", DataTypes.STRING()),
@@ -86,8 +86,7 @@ def process():
           letters = string.ascii_lowercase
           token = ''.join(random.choice(letters) for i in range(16))
           rows.append((token, order_id, image_number+1, f'site-url/{token}'))
-    t_env.from_elements(rows, CONST_DATATYPE).execute_insert('MysqlSink').wait()
-    source_table.collect().close()
-    sink_table.collect().close()
+    images_table = t_env.from_elements(rows, CONST_DATATYPE)
+    images_table.execute_insert('ImagesTable').wait()
 if __name__ == "__main__":
     process()
