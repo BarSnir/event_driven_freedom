@@ -1,4 +1,4 @@
-import json, os, subprocess
+import json, os, subprocess, time
 from libs.utils.docker import DockerUtils
 from libs.utils.subprocess import SubprocessUtil
 
@@ -13,14 +13,12 @@ def process(logger):
     try:
         with open(f"{os.getenv('PROCESS_CONFIG_PATH')}") as process_config_file:
             process_config = json.load(process_config_file).get('batch')
-            process_path = process_config.get('process_command')[
-                len(process_config.get('process_command')) - 1
-            ]
+            process_file_path = SubprocessUtil.get_process_file_path(process_config)
             process_list = process_config.get('process_list')
             process_sum = len(process_list)
             for process in process_list:
                 index = process_list.index(process) + 1
-                process_file_path =  f"{process_path}/{process}.py"
+                process_file_path =  f"{process_file_path}/{process}.py"
                 command_list = process_config.get('process_command')
                 command_list[len(command_list) - 1] = process_file_path
                 logger.info(f"Running {process}, {index} out of {process_sum}.")

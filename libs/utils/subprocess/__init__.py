@@ -8,4 +8,9 @@ class SubprocessUtil:
     @staticmethod
     def allow_execute_pyflink_flies():
         subprocess.call("chmod -R +x /opt/flink/ops", shell=True)
+    @staticmethod
+    def get_process_file_path(process_config):
+        return process_config.get('process_command')[
+            len(process_config.get('process_command')) - 1
+        ]
 

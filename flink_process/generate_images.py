@@ -63,17 +63,17 @@ def process():
             'username'='root',
             'password'='password',
             'sink.parallelism' = '3',
-            'sink.buffer-flush.interval' = '500',
+            'sink.buffer-flush.interval' = '10000',
             'sink.buffer-flush.max-rows' = '10000',
             'sink.max-retries' = '10'
         );
     """
+    # BE AWARE OF FLUSH INTERVAL!!!
     t_env.execute_sql(source_ddl)
     t_env.execute_sql(sink_ddl)
     panda_table = t_env.from_path('MysqlSource').to_pandas()
     for item in panda_table.to_dict(orient='records'):
        order_id_list.append(item['OrderID'])
-    panda_table = []
     CONST_DATATYPE = DataTypes.ROW([
        DataTypes.FIELD("ImageId", DataTypes.STRING()),
        DataTypes.FIELD("OrderId", DataTypes.STRING()),
