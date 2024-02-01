@@ -1,0 +1,3 @@
+
+def process(logger):
+    pass
