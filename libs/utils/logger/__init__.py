@@ -28,3 +28,7 @@ class ColorLogger:
         logger.setLevel(self._log_level)
         logger.addHandler(stream)
         return logger
+    
+    @staticmethod
+    def log_new_step_dashes(logger):
+        logger.info("------------------------------------------------------------------------------")

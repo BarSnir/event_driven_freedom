@@ -1,18 +1,22 @@
 import json, os, subprocess, time
 from libs.utils.docker import DockerUtils
 from libs.utils.subprocess import SubprocessUtil
+from libs.utils.logger import ColorLogger
 
-MODULE_MESSAGE = 'Step B || Generating datasets in 20s with Flink batch operations!'
-LOGGER_NAME = 'dataset_ingest'
+MODULE_MESSAGE = 'Step B || Generating datasets with Apache Flink batch operations!'
 DOCKER_ACCESS = '/var/run/docker.sock'
 
 def process(logger):
+    ColorLogger.log_new_step_dashes(logger)
     logger.info(MODULE_MESSAGE)
+    ColorLogger.log_new_step_dashes(logger)
     SubprocessUtil.allow_execute_pyflink_flies()
     docker_util = DockerUtils(DOCKER_ACCESS)
     try:
         with open(f"{os.getenv('PROCESS_CONFIG_PATH')}") as process_config_file:
             null_logging = open("NUL","w")
+            if os.getenv('LOG_LEVEL') == 'DEBUG':
+                null_logging = None
             process_config_files = json.load(process_config_file).get('batch')
             process_list = process_config_files.get('process_list')
             process_sum = len(process_list)
@@ -25,7 +29,12 @@ def process(logger):
                 command_list.append(process_file_path)
                 logger.info(f"Running {process}, {index} out of {process_sum}.")
                 logger.debug(command_list)
-                subprocess.Popen(command_list, stdout = null_logging).wait()
+                subprocess.Popen(
+                    command_list,
+                    stdin=null_logging,
+                    stdout=null_logging,
+                    stderr=null_logging
+                ).wait()
                 logger.info(f"Done!")
     except IOError as ioe:
         logger.error("IO exception with trace:")
