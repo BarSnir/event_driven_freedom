@@ -2,16 +2,17 @@
     "batch": {
         "host": "jobmanager",
         "port:": "8081",
+        "ops_prefix": "/opt/flink/ops",
         "process_list": [
-            "generate_market_info",
-            "generate_vehicles",
-            "generate_orders",
-            "generate_images",
-            "generate_customers",
-            "generate_auth_types",
-            "generate_improves",
-            "generate_media_type",
-            "generate_statuses"
+            "generate_market_info.py",
+            "generate_vehicles.py",
+            "generate_orders.py",
+            "generate_images.py",
+            "generate_customers.py",
+            "generate_auth_types.py",
+            "generate_improves.py",
+            "generate_media_type.py",
+            "generate_statuses.py"
         ],
         "process_command": [
             "./bin/flink",
@@ -23,8 +24,7 @@
             "/usr/bin/python",
             "-pyexec",
             "/usr/bin/python",
-            "-py",
-            "/opt/flink/ops"
+            "-py"
         ]
     }
 }

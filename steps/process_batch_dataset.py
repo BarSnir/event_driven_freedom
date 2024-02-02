@@ -12,19 +12,20 @@ def process(logger):
     docker_util = DockerUtils(DOCKER_ACCESS)
     try:
         with open(f"{os.getenv('PROCESS_CONFIG_PATH')}") as process_config_file:
-            process_config = json.load(process_config_file).get('batch')
-            process_file_path = SubprocessUtil.get_process_file_path(process_config)
-            process_list = process_config.get('process_list')
+            null_logging = open("NUL","w")
+            process_config_files = json.load(process_config_file).get('batch')
+            process_list = process_config_files.get('process_list')
             process_sum = len(process_list)
+            ops_prefix  = process_config_files.get('ops_prefix')
             for process in process_list:
                 index = process_list.index(process) + 1
-                process_file_path =  f"{process_file_path}/{process}.py"
-                command_list = process_config.get('process_command')
-                command_list[len(command_list) - 1] = process_file_path
+                process_file_path =  f"{ops_prefix}/{process}"
+                command_list = list(process_config_files.get('process_command'))
+                logger.debug(f"Process file path: {process_file_path}")
+                command_list.append(process_file_path)
                 logger.info(f"Running {process}, {index} out of {process_sum}.")
                 logger.debug(command_list)
-                proc = subprocess.Popen(command_list)
-                proc.wait()
+                subprocess.Popen(command_list, stdout = null_logging).wait()
                 logger.info(f"Done!")
     except IOError as ioe:
         logger.error("IO exception with trace:")
