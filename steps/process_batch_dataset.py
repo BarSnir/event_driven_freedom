@@ -1,4 +1,4 @@
-import json, os, subprocess, time
+import json, os, subprocess
 from libs.utils.docker import DockerUtils
 from libs.utils.subprocess import SubprocessUtil
 from libs.utils.logger import ColorLogger
@@ -48,5 +48,5 @@ def process(logger):
         logger.exception(e)
     finally:
         logger.info("Shutting down flink batch cluster.")
-        docker_util.stop_container("jobmanager")
-        docker_util.stop_container("taskmanager")
+        docker_util.restart_container("jobmanager")
+        docker_util.restart_container("taskmanager")
