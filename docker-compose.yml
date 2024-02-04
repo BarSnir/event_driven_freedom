@@ -161,9 +161,9 @@ services:
     platform: linux/arm64/v8
     attach: false
     restart: always
-    mem_limit: 5700m
-    mem_reservation: 5500m
-    cpus: 4
+    mem_limit: 6700m
+    mem_reservation: 6500m
+    cpus: 6
     build:
       context: ./images/pyflink
       dockerfile: .Dockerfile
@@ -177,10 +177,10 @@ services:
       - |
         FLINK_PROPERTIES=
         jobmanager.rpc.address: jobmanager
-        taskmanager.numberOfTaskSlots: 4
+        taskmanager.numberOfTaskSlots: 6
         parallelism.default: 1
-        taskmanager.memory.process.size: 5500m
-        taskmanager.memory.flink.size: 4500m
+        taskmanager.memory.process.size: 6500m
+        taskmanager.memory.flink.size: 5500m
         taskmanager.memory.task.heap.size: 800m
         taskmanager.memory.framework.off-heap.size: 500m
         taskmanager.memory.framework.heap.size: 800m
@@ -206,6 +206,7 @@ services:
       - ENV=development
       - DB_CONFIG=/opt/flink/project/configs/database.json
       - PROCESS_CONFIG_PATH=/opt/flink/project/configs/process_config.json
+      - CONNECTOR_CONFIG_PATH=/opt/flink/project/configs/debezium.json
       - SCRIPTS_PATH_DIR=/opt/flink/project/scripts
     volumes:
       - ./flink_process:/opt/flink/ops
