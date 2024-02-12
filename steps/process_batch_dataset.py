@@ -47,5 +47,5 @@ def process(logger):
         logger.exception(e)
     finally:
         logger.info("Shutting down flink batch cluster.")
-        docker_util.restart_container("jobmanager")
-        docker_util.restart_container("taskmanager")
+        docker_util.stop_container("jobmanager")
+        docker_util.stop_container("taskmanager")

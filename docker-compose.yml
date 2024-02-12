@@ -139,6 +139,7 @@ services:
   jobmanager:
     container_name: jobmanager
     platform: linux/arm64/v8
+    hostname: jobmanager
     build:
       context: ./images/pyflink
       dockerfile: .Dockerfile
@@ -153,7 +154,7 @@ services:
       - |
         FLINK_PROPERTIES=
         jobmanager.rpc.address: jobmanager
-        jobmanager.memory.process.size: 1000m
+        jobmanager.memory.process.size: 2500m
         jobstore.max-capacity: 8
         jobstore.type: file
   taskmanager:
@@ -177,7 +178,7 @@ services:
       - |
         FLINK_PROPERTIES=
         jobmanager.rpc.address: jobmanager
-        taskmanager.numberOfTaskSlots: 6
+        taskmanager.numberOfTaskSlots: 8
         parallelism.default: 1
         taskmanager.memory.process.size: 6500m
         taskmanager.memory.flink.size: 5500m
