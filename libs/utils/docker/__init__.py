@@ -12,4 +12,4 @@ class DockerUtils:
         )
 
     def stop_container(self, container_name):
-        self.docker_client.containers.get(container_name).restart()
+        self.docker_client.containers.get(container_name).stop()
