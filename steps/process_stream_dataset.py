@@ -11,7 +11,15 @@ def process(logger):
     try:
         with open(f"{os.getenv('CONNECTOR_CONFIG_PATH')}") as connector_config_file:
             connector_config = json.load(connector_config_file)
-            requests.put(CONNECT_URL,data=json.dumps(connector_config))
+            headers={
+                'Content-type': 'application/json'
+            }
+            logger.debug(connector_config)
+            requests.put(
+                CONNECT_URL,
+                json=connector_config,
+                headers=headers
+            )
     except:
         pass
     # Wakeup flink stream clusters.

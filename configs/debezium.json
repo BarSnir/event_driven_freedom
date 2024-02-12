@@ -52,5 +52,6 @@
     "transforms.dropPrefix.regex": "prodcution.production.(.*)",
     "transforms.dropPrefix.replacement": "$1",
     "delete.handling​.mode": "none",
+    "topic.prefix": "prodcution.production.",
     "connect.meta.data": "false"
 }
