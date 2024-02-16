@@ -27,6 +27,7 @@ def process(logger):
         )
         logger.debug(topic_list)
         kafka_admin_client.find_topics(topic_list)
+        logger.info(f"Done!")
     except RequestException:
         logger.error("Pay attention to connector request.")
     except Exception as e:
