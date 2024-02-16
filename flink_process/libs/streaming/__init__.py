@@ -11,7 +11,7 @@ class FlinkStreamingEnvironment:
         self.env_settings = self.get_env_settings()
         self.jar_path = "file:///opt/flink/opt/"
         self.job_configs_path = "/opt/flink/ops/configs/jobs.json"
-        self.job_config = self.get_job_config(self.job_name)
+        self.job_config = self.get_job_config()
 
     def get_env_settings(self):
         return EnvironmentSettings.in_streaming_mode()
@@ -25,8 +25,8 @@ class FlinkStreamingEnvironment:
         .set('parallelism.default', '2')
         return table_env
 
-    def get_job_config(self, job_name):
-        return FileUtils.get_json_file(self.job_configs_path).get(job_name)
+    def get_job_config(self):
+        return FileUtils.get_json_file(self.job_configs_path).get(self.job_name)
 
     def get_jars_full_path(self):
         comma = ';'

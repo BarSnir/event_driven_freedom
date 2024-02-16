@@ -1,13 +1,11 @@
 import random
 from pyflink.table.udf import udf
 from pyflink.table import ( 
-    EnvironmentSettings, 
-    TableEnvironment,
     DataTypes,
     expressions as F
 )
 from libs.streaming import FlinkStreamingEnvironment
-from libs.connectors import FlinkConnector
+from libs.connectors.file_system import FlinkFileSystemConnector
 import logging
 logger = logging.getLogger()
 
@@ -66,8 +64,10 @@ def get_int_range(text):
 
 def process():
     streaming_env = FlinkStreamingEnvironment('market_info')
+    job_config = streaming_env.job_config
     table_env = streaming_env.get_table_streaming_environment()
-    source_ddl = FlinkConnector().get_csv_connector()
+    source_connector = FlinkFileSystemConnector(job_config.get('market_info_csv'))
+    source_ddl = source_connector.generate_fs_connector('csv')
     sink_ddl = """
         CREATE TABLE MysqlSink (
             `MarketInfoId` VARCHAR,
@@ -105,7 +105,7 @@ def process():
     """
     source_table = table_env.execute_sql(source_ddl)
     sink_table = table_env.execute_sql(sink_ddl)
-    market_info_table = table_env.from_path('MarketInfoInit')
+    market_info_table = table_env.from_path(source_connector.table_name)
     market_info_table = market_info_table.select(
         F.col('make').alias('ManufacturerText'),
         F.col('model').alias('ModelText'),

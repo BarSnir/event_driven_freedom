@@ -4,6 +4,16 @@
             "flink-connector-jdbc-3.1.0-1.17.jar",
             "mysql-connector-java-5.1.9.jar",
             "flink-python-1.17.1.jar"
-        ]
+        ],
+        "market_info_csv": {
+            "table_name": "market_info_csv_source",
+            "schema": [
+                "`year` VARCHAR,",
+                "`make` VARCHAR,",
+                "`model` VARCHAR,",
+                "`body_styles` VARCHAR"
+            ],
+            "path": "file:///opt/flink/datasets/market_info"
+        }
     }
 }
