@@ -211,6 +211,7 @@ services:
       - DEBEZIUM_CONFIG_FILE_PATH=/opt/flink/project/configs/debezium.json
       - SCRIPTS_PATH_DIR=/opt/flink/project/scripts
       - CONNECT_URL=http://kafka-connect:8083
+      - KAFKA_SERVERS=broker:29092
     volumes:
       - ./flink_process:/opt/flink/ops
       - ./jars:/opt/flink/opt

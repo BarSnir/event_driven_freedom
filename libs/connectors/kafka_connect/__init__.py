@@ -1,18 +1,23 @@
 import json, requests, os
-class KafkaConnectConnector:
+from requests.exceptions import RequestException
+class KafkaConnectClient:
 
     def __init__(self):
-        pass
+        self.connect_url = os.getenv('CONNECT_URL')
+        self.NEW_CONNECTOR_PATH = f"{self.connect_url}/connectors/"
+        self.HEADERS = {
+            'Content-type': 'application/json'
+        }
 
     def post_new_connector(self, logger, connector_config_file):
         connector_config = json.load(connector_config_file)
-        headers={
-            'Content-type': 'application/json'
-        }
         logger.debug(connector_config)
-        logger.debug(f"{os.getenv('CONNECT_URL')}/connectors")
-        return requests.post(
-            f"{os.getenv('CONNECT_URL')}/connectors/",
+        logger.debug(f"{self.NEW_CONNECTOR_PATH }")
+        response = requests.post(
+            self.NEW_CONNECTOR_PATH,
             json=connector_config,
-            headers=headers
+            headers=self.HEADERS
         )
+        if response.status_code == 400:
+            logger.error(response.json())
+            raise RequestException
