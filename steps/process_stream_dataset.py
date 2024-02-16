@@ -2,7 +2,6 @@ import json, requests,os
 from libs.utils.logger import ColorLogger
 
 MODULE_MESSAGE = 'Step C || Generating Debezium & Apache Flink stream operations!'
-CONNECT_URL = 'http://kafka-connect:8083/connectors/debezium_pyflink_v1/config'
 
 def process(logger):
     ColorLogger.log_new_step_dashes(logger)
@@ -15,8 +14,9 @@ def process(logger):
                 'Content-type': 'application/json'
             }
             logger.debug(connector_config)
-            requests.put(
-                CONNECT_URL,
+            logger.debug(f"{os.getenv('CONNECT_URL')}/connectors")
+            requests.post(
+                f"{os.getenv('CONNECT_URL')}/connectors/",
                 json=connector_config,
                 headers=headers
             )

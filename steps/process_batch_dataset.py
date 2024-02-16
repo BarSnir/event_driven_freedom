@@ -1,4 +1,4 @@
-import json, os, subprocess
+import json, os, subprocess, time
 from libs.utils.docker import DockerUtils
 from libs.utils.subprocess import SubprocessUtil
 from libs.utils.logger import ColorLogger
@@ -7,6 +7,7 @@ MODULE_MESSAGE = 'Step B || Generating datasets with Apache Flink batch operatio
 DOCKER_ACCESS = '/var/run/docker.sock'
 
 def process(logger):
+    time.sleep(10)
     ColorLogger.log_new_step_dashes(logger)
     logger.info(MODULE_MESSAGE)
     ColorLogger.log_new_step_dashes(logger)

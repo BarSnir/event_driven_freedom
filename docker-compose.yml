@@ -112,11 +112,11 @@ services:
       CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: "1"
       CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: "1"
       CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: "1"
-      CONNECT_PLUGIN_PATH: '/usr/share/java,/data/connectors/'
-    volumes:
-      - ./connectors:/data/connectors/
+      CONNECT_PLUGIN_PATH: '/usr/share/java,/usr/share/confluent-hub-components'
     command: > 
-      bash -c "/etc/confluent/docker/run"
+      bash -c "
+      confluent-hub install --no-prompt debezium/debezium-connector-mysql:2.2.1 && \
+      /etc/confluent/docker/run"
   control-center:
     image: confluentinc/cp-enterprise-control-center:7.5.3
     hostname: control-center
@@ -209,6 +209,7 @@ services:
       - PROCESS_CONFIG_PATH=/opt/flink/project/configs/process_config.json
       - CONNECTOR_CONFIG_PATH=/opt/flink/project/configs/debezium.json
       - SCRIPTS_PATH_DIR=/opt/flink/project/scripts
+      - CONNECT_URL=http://kafka-connect:8083
     volumes:
       - ./flink_process:/opt/flink/ops
       - ./jars:/opt/flink/opt
