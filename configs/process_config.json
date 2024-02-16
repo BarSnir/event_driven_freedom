@@ -26,5 +26,28 @@
             "/usr/bin/python",
             "-py"
         ]
+    },
+    "stream": {
+        "host": "jobmanager",
+        "port:": "8081",
+        "ops_prefix": "/opt/flink/ops",
+        "process_list": [
+            "aggregate_images.py",
+            "enrich_full_order.py",
+            "enrich_full_vehicle.py",
+            "full_ad_enrich.py"
+        ],
+        "process_command": [
+            "./bin/flink",
+            "run",
+            "--detached",
+            "--jobmanager",
+            "jobmanager:8081",
+            "-pyclientexec",
+            "/usr/bin/python",
+            "-pyexec",
+            "/usr/bin/python",
+            "-py"
+        ]
     }
 }

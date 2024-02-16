@@ -11,5 +11,5 @@ class DockerUtils:
             base_url=f'unix:/{self.connection_file_path}'
         )
 
-    def stop_container(self, container_name):
-        self.docker_client.containers.get(container_name).stop()
+    def restart_container(self, container_name):
+        self.docker_client.containers.get(container_name).restart()

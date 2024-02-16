@@ -9,8 +9,7 @@ class KafkaConnectClient:
             'Content-type': 'application/json'
         }
 
-    def post_new_connector(self, logger, connector_config_file):
-        connector_config = json.load(connector_config_file)
+    def post_new_connector(self, logger, connector_config):
         logger.debug(connector_config)
         logger.debug(f"{self.NEW_CONNECTOR_PATH }")
         response = requests.post(

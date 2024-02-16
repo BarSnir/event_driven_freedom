@@ -1,24 +1,19 @@
-import json, os, subprocess, time
-from libs.utils.docker import DockerUtils
-from libs.utils.subprocess import SubprocessUtil
+import os, json, subprocess, time
 from libs.utils.logger import ColorLogger
 
-MODULE_MESSAGE = 'Step B || Generating datasets with Apache Flink batch operations!'
-DOCKER_ACCESS = '/var/run/docker.sock'
+MODULE_MESSAGE = 'Step D || Generating Apache Flink stream operations!'
 
-def process(logger):
-    time.sleep(10)
+
+def process(logger, backoff_seconds=120):
     ColorLogger.log_new_step_dashes(logger)
     logger.info(MODULE_MESSAGE)
     ColorLogger.log_new_step_dashes(logger)
-    SubprocessUtil.allow_execute_pyflink_flies()
-    docker_util = DockerUtils(DOCKER_ACCESS)
     try:
         with open(f"{os.getenv('PROCESS_CONFIG_PATH')}") as process_config_file:
             null_logging = open("NUL","w")
             if os.getenv('LOG_LEVEL') == 'DEBUG':
                 null_logging = None
-            process_config_files = json.load(process_config_file).get('batch')
+            process_config_files = json.load(process_config_file).get('stream')
             process_list = process_config_files.get('process_list')
             process_sum = len(process_list)
             ops_prefix  = process_config_files.get('ops_prefix')
@@ -35,18 +30,12 @@ def process(logger):
                     stdin=null_logging,
                     stdout=null_logging,
                     stderr=null_logging
-                ).wait()
+                )
                 logger.info(f"Done!")
+                time.sleep(backoff_seconds)
     except IOError as ioe:
         logger.error("IO exception with trace:")
         logger.exception(ioe)
     except TimeoutError() as timeout:
         logger.error("Timeout with process")
         logger.exception(timeout.strerror)
-    except Exception as e:
-        logger.error("Something wired happened")
-        logger.exception(e)
-    finally:
-        logger.info("Shutting down flink batch cluster.")
-        docker_util.restart_container("jobmanager")
-        docker_util.restart_container("taskmanager")
