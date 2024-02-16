@@ -6,6 +6,7 @@ from pyflink.table import (
     DataTypes,
     expressions as F
 )
+from libs.streaming import FlinkStreamingEnvironment
 from libs.connectors import FlinkConnector
 import logging
 logger = logging.getLogger()
@@ -63,28 +64,9 @@ def get_int_range(text):
     )
     return value
 
-def get_jars_path():
-    return f'file:///opt/flink/opt/'
-
-def get_jars_full_path() -> str:
-  jars_path = get_jars_path()
-  jars = [
-    'flink-connector-jdbc-3.1.0-1.17.jar;',
-    'mysql-connector-java-5.1.9.jar;',
-    'flink-python-1.17.1.jar'
-  ]
-  full_str = ''
-  for jar in jars:
-    full_str = f'{full_str}{jars_path}{jar}'
-  return full_str
-
 def process():
-    environment_settings = EnvironmentSettings.in_streaming_mode()
-    t_env = TableEnvironment.create(environment_settings)
-    t_env.get_config().set('pipeline.jars',get_jars_full_path()) \
-    .set('python.fn-execution.bundle.time', '100000') \
-    .set('python.fn-execution.bundle.size', '10') \
-    .set('parallelism.default', '2')
+    streaming_env = FlinkStreamingEnvironment('market_info')
+    table_env = streaming_env.get_table_streaming_environment()
     source_ddl = FlinkConnector().get_csv_connector()
     sink_ddl = """
         CREATE TABLE MysqlSink (
@@ -121,9 +103,9 @@ def process():
             'sink.max-retries' = '10'
         );
     """
-    source_table = t_env.execute_sql(source_ddl)
-    sink_table = t_env.execute_sql(sink_ddl)
-    market_info_table = t_env.from_path('MarketInfoInit')
+    source_table = table_env.execute_sql(source_ddl)
+    sink_table = table_env.execute_sql(sink_ddl)
+    market_info_table = table_env.from_path('MarketInfoInit')
     market_info_table = market_info_table.select(
         F.col('make').alias('ManufacturerText'),
         F.col('model').alias('ModelText'),
