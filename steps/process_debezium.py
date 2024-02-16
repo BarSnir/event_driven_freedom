@@ -6,8 +6,7 @@ from libs.utils.logger import ColorLogger
 from libs.connectors.kafka_connect import KafkaConnectClient
 from libs.connectors.kafka_admin import KafkaAdminClientWrap
 
-
-MODULE_MESSAGE = 'Step C || Generating Debezium & Apache Flink stream operations!'
+MODULE_MESSAGE = 'Step C || Generating Debezium'
         
 def process(logger):
     ColorLogger.log_new_step_dashes(logger)
@@ -18,9 +17,9 @@ def process(logger):
     FILE_PATH = os.getenv('DEBEZIUM_CONFIG_FILE_PATH')
     try:
         config = FileUtils.get_json_file(FILE_PATH)
-        # kafka_connect_client.post_new_connector(
-        #     logger, config
-        # )
+        kafka_connect_client.post_new_connector(
+            logger, config
+        )
         topic_list = ListUtils.str_to_list(
             config.get('config').get('table.include.list'),
             special_erases=['production.']
@@ -30,5 +29,3 @@ def process(logger):
         logger.error("Pay attention to connector request.")
     except Exception as e:
         logger.error(e)
-    # Wakeup flink stream clusters.
-    # Run flink stream workflow.
