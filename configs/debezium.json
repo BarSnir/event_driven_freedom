@@ -1,5 +1,5 @@
 {
-    "name": "debezium_pyflink_v2",
+    "name": "debezium_pyflink_v1",
     "config":{
         "connector.class": "io.debezium.connector.mysql.MySqlConnector",
         "database.history.kafka.bootstrap.servers": "broker:29092",
@@ -15,8 +15,9 @@
         "database.server.name": "prodcution",
         "database.ssl.mode": "required",
         "database.user": "root",
+        "topic.prefix": "production",
         "errors.deadletterqueue.context.headers.enable": "true",
-        "errors.deadletterqueue.topic.name": "dlq-debezium",
+        "errors.deadletterqueue.topic.name": "dlq-debezium-v1",
         "errors.deadletterqueue.topic.replication.factor": "1",
         "errors.log.enable": "true",
         "errors.retry.delay.max.ms": "60000",
@@ -50,12 +51,11 @@
         "value.converter.enhanced.avro.schema.support": "false",
         "transforms": "dropPrefix",
         "transforms.dropPrefix.type": "org.apache.kafka.connect.transforms.RegexRouter",
-        "transforms.dropPrefix.regex": "prodcution.production.(.*)",
+        "transforms.dropPrefix.regex": "production.production.(.*)",
         "transforms.dropPrefix.replacement": "$1",
-        "delete.handling​.mode": "none",
-        "topic.prefix": "prodcution.production.",
+        "delete.tombstone.handling.mode": "tombstone",
         "connect.meta.data": "false",
-        "schema.history.internal.kafka.topic": "schema_debezium_history",
+        "schema.history.internal.kafka.topic": "schema_debezium_history_v1",
         "schema.history.internal.kafka.bootstrap.servers": "broker:29092"
     }
 }
