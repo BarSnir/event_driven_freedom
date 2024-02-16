@@ -12,3 +12,4 @@ if __name__ == "__main__":
     process_batch_dataset.process(logger)
     process_debezium.process(logger)
     process_stream_enriches.process(logger)
+    logger.info("Done, thank you for given freedom to your data!")
