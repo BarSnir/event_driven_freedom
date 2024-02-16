@@ -180,13 +180,13 @@ services:
         jobmanager.rpc.address: jobmanager
         taskmanager.numberOfTaskSlots: 8
         parallelism.default: 1
-        taskmanager.memory.process.size: 6500m
+        taskmanager.memory.process.size: 7000m
         taskmanager.memory.flink.size: 5500m
         taskmanager.memory.task.heap.size: 800m
         taskmanager.memory.framework.off-heap.size: 500m
         taskmanager.memory.framework.heap.size: 800m
         taskmanager.memory.task.off-heap.size: 500m
-        taskmanager.memory.jvm-metaspace.size: 700m
+        taskmanager.memory.jvm-metaspace.size: 1200m
     links:
       - db:db
   pyflink-client:
@@ -207,7 +207,7 @@ services:
       - ENV=development
       - DB_CONFIG=/opt/flink/project/configs/database.json
       - PROCESS_CONFIG_PATH=/opt/flink/project/configs/process_config.json
-      - CONNECTOR_CONFIG_PATH=/opt/flink/project/configs/debezium.json
+      - DEBEZIUM_CONFIG_FILE_PATH=/opt/flink/project/configs/debezium.json
       - SCRIPTS_PATH_DIR=/opt/flink/project/scripts
       - CONNECT_URL=http://kafka-connect:8083
     volumes:
