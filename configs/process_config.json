@@ -4,15 +4,7 @@
         "port:": "8081",
         "ops_prefix": "/opt/flink/ops",
         "process_list": [
-            "generate_market_info.py",
-            "generate_vehicles.py",
-            "generate_orders.py",
-            "generate_images.py",
-            "generate_customers.py",
-            "generate_auth_types.py",
-            "generate_improves.py",
-            "generate_media_type.py",
-            "generate_statuses.py"
+            "generate_market_info"
         ],
         "process_command": [
             "./bin/flink",
@@ -24,7 +16,9 @@
             "/usr/bin/python",
             "-pyexec",
             "/usr/bin/python",
-            "-py"
+            "--pyFiles",
+            "/opt/flink/ops",
+            "--pyModule"
         ]
     },
     "stream": {

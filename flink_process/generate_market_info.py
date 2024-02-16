@@ -1,5 +1,4 @@
 import random
-from random import randrange
 from pyflink.table.udf import udf
 from pyflink.table import ( 
     EnvironmentSettings, 
@@ -7,7 +6,7 @@ from pyflink.table import (
     DataTypes,
     expressions as F
 )
-
+from libs.connectors import FlinkConnector
 import logging
 logger = logging.getLogger()
 
@@ -86,18 +85,7 @@ def process():
     .set('python.fn-execution.bundle.time', '100000') \
     .set('python.fn-execution.bundle.size', '10') \
     .set('parallelism.default', '2')
-    source_ddl = """
-        CREATE TABLE MarketInfoInit (
-            `year` VARCHAR,
-            `make` VARCHAR,
-            `model` VARCHAR,
-            `body_styles` VARCHAR
-        ) WITH (
-            'connector' = 'filesystem',
-            'path' = 'file:///opt/flink/datasets/market_info',
-            'format' = 'csv'
-        );
-    """     
+    source_ddl = FlinkConnector().get_csv_connector()
     sink_ddl = """
         CREATE TABLE MysqlSink (
             `MarketInfoId` VARCHAR,
