@@ -16,13 +16,13 @@ class FlinkStreamingEnvironment:
     def get_env_settings(self):
         return EnvironmentSettings.in_streaming_mode()
 
-    def get_table_streaming_environment(self)-> TableEnvironment:
+    def get_table_streaming_environment(self, parallelism=1)-> TableEnvironment:
         table_env = TableEnvironment.create(self.env_settings)
         table_env.get_config() \
         .set('pipeline.jars', self.get_jars_full_path()) \
         .set('python.fn-execution.bundle.time', '100000') \
         .set('python.fn-execution.bundle.size', '10') \
-        .set('parallelism.default', '2')
+        .set('parallelism.default', str(parallelism))
         return table_env
 
     def get_job_config(self):

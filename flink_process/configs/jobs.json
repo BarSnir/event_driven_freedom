@@ -14,6 +14,42 @@
                 "`body_styles` VARCHAR"
             ],
             "path": "file:///opt/flink/datasets/market_info"
+        },
+        "market_info_mysql": {
+            "table_name": "market_info_mysql_source",
+            "schema": [
+                "`MarketInfoId` VARCHAR,",
+                "`ManufacturerId` BIGINT,",
+                "`ManufacturerText` VARCHAR,",
+                "`ModelId` BIGINT,",
+                "`ModelText` VARCHAR,",
+                "`Year` INT,",
+                "`MarketPrice` INT,",
+                "`AirBags` INT,",
+                "`SunRoof` TINYINT,",
+                "`MagnesiumWheels` TINYINT,",
+                "`ReversSensors` TINYINT,",
+                "`ABS` TINYINT,",
+                "`Hybrid` TINYINT,",
+                "`Doors` INT,",
+                "`EnvironmentFriendlyLevel` INT,",
+                "`SecurityTestLevel` INT,",
+                "`HorsePower` INT,",
+                "`CruseControl` TINYINT,",
+                "`PowerWheel` TINYINT,",
+                "`FullyAutonomic` TINYINT,",
+                "PRIMARY KEY (MarketInfoId) NOT ENFORCED"
+            ],
+            "connector_config": [
+                "'url' = 'jdbc:mysql://db:3306/production',",
+                "'table-name' = 'MarketInfo',",
+                "'username'='root',",
+                "'password'='password',",
+                "'sink.parallelism' = '2',",
+                "'sink.buffer-flush.interval' = '0',",
+                "'sink.buffer-flush.max-rows' = '10',",
+                "'sink.max-retries' = '10'"
+            ]
         }
     }
 }

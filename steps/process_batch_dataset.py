@@ -44,6 +44,6 @@ def process(logger):
         logger.error("Something wired happened")
         logger.exception(e)
     finally:
-        logger.info("Shutting down flink batch cluster.")
+        logger.info("Restarting flink cluster...")
         docker_util.restart_container("jobmanager")
         docker_util.restart_container("taskmanager")
