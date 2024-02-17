@@ -6,7 +6,6 @@ from pyflink.table import DataTypes, expressions as F
 from libs.connectors.file_system import FlinkFileSystemConnector
 
 customer_id_list = []
-
 @udf(result_type=DataTypes.INT())
 def get_customer_id():
     global customer_id_list

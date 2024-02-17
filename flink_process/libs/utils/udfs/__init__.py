@@ -83,20 +83,43 @@ class FlinkUDFs:
     @staticmethod
     @udf(result_type=DataTypes.STRING())
     def get_customer_type_text(dict_type, id):
-        suspended_dict = {
-        '1': 'impostor',
-        '2': 'payment',
-        '3': 'hacker',
-        '4': 'scam',
-        '5': 'bot',
-        '6': 'spam',
-        }
-        customer_type_dict = {
-        '1': 'regular',
-        '2': 'bronze',
-        '3': 'silver',
-        '4': 'gold',
-        '5': 'platinum',
-        }
+        suspended_dict = maps_helper.get('suspended_dict')
+        customer_type_dict = maps_helper.get('customer_type_dict')
         abstract_dict = locals()[f'{dict_type}_dict']
         return abstract_dict.get(str(id))
+    
+    @staticmethod
+    @udf(result_type=DataTypes.STRING())
+    def get_stage_level_text(id):
+        stage_level_dict = maps_helper.get('improves_stage_level')
+        return stage_level_dict.get(id, None)
+
+    @staticmethod
+    @udf(result_type=DataTypes.INT())
+    def get_stage_level_id(id):
+        stage_level_dict = {
+            8: 1,
+            9: 2,
+            10: 3,
+        }
+        return stage_level_dict.get(id, None)
+    
+    @staticmethod
+    @udf(result_type=DataTypes.STRING())
+    def get_improved_parts(id):
+        improve_dict = maps_helper.get('improves')
+        return str(improve_dict.get(id))
+    
+    @staticmethod
+    @udf(result_type=DataTypes.STRING())
+    def get_slots_type():
+        index_usb_slot = random.randrange(0,2)
+        slots_type_list = ['B', 'C']
+        return slots_type_list[index_usb_slot]
+    
+    @staticmethod   
+    @udf(result_type=DataTypes.STRING())
+    def get_status_text(id):
+        status_dict = maps_helper.get('status_text')
+        return status_dict.get(str(id))
+    

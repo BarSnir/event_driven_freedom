@@ -177,7 +177,7 @@
                 "'password'='password',",
                 "'sink.parallelism' = '3',",
                 "'sink.buffer-flush.interval' = '10000',",
-                "'sink.buffer-flush.max-rows' = '10000',",
+                "'sink.buffer-flush.max-rows' = '5000000',",
                 "'sink.max-retries' = '10'"
             ]
         }
@@ -232,6 +232,164 @@
             "connector_config": [
                 "'url' = 'jdbc:mysql://db:3306/production',",
                 "'table-name' = 'Customers',",
+                "'username'='root',",
+                "'password'='password',",
+                "'sink.parallelism' = '1',",
+                "'sink.buffer-flush.interval' = '0',",
+                "'sink.buffer-flush.max-rows' = '10',",
+                "'sink.max-retries' = '10'"
+            ]
+        }
+    },
+    "generate_auth_types": {
+        "jars": [
+            "flink-connector-jdbc-3.1.0-1.17.jar",
+            "mysql-connector-java-5.1.9.jar",
+            "flink-python-1.17.1.jar"
+        ],
+        "auth_types_datagen_source": {
+            "table_name": "auth_types_datagen_source",
+            "schema": [
+                "`AuthTypeID` INT"
+            ],
+            "connector_config": [
+                "'number-of-rows' = '4',",
+                "'fields.AuthTypeID.kind' = 'sequence',",
+                "'fields.AuthTypeID.start' = '1',",
+                "'fields.AuthTypeID.end' = '4'"
+            ]
+        },
+        "auth_types_jdbc_sink": {
+            "table_name": "auth_types_jdbc_sink",
+            "schema": [
+                "`AuthTypeID` INT,",
+                "`AuthByGoogle` INT,",
+                "`AuthByApple` INT,",
+                "`AuthByFacebook` INT,",
+                "`AuthByTwitter` INT,",
+                "PRIMARY KEY (AuthTypeID) NOT ENFORCED"
+            ],
+            "connector_config": [
+                "'url' = 'jdbc:mysql://db:3306/production',",
+                "'table-name' = 'AuthTypes',",
+                "'username'='root',",
+                "'password'='password',",
+                "'sink.parallelism' = '1',",
+                "'sink.buffer-flush.interval' = '0',",
+                "'sink.buffer-flush.max-rows' = '10',",
+                "'sink.max-retries' = '10'"
+            ]
+        }
+    },
+    "generate_improves": {
+        "jars": [
+            "flink-connector-jdbc-3.1.0-1.17.jar",
+            "mysql-connector-java-5.1.9.jar",
+            "flink-python-1.17.1.jar"
+        ],
+        "improves_datagen_source": {
+            "table_name": "improves_datagen_source",
+            "schema": [
+                "`ImproveId` INT"
+            ],
+            "connector_config": [
+                "'number-of-rows' = '10',",
+                "'fields.ImproveId.kind' = 'sequence',",
+                "'fields.ImproveId.start' = '1',",
+                "'fields.ImproveId.end' = '10'"
+            ]
+        },
+        "improves_jdbc_sink": {
+            "table_name": "improves_jdbc_sink",
+            "schema": [
+                "`ImproveId` INT,",
+                "`StageLevel` INT,",
+                "`StageText` VARCHAR,",
+                "`PartsImprovedList` VARCHAR,",
+                "PRIMARY KEY (ImproveId) NOT ENFORCED"
+            ],
+            "connector_config": [
+                "'url' = 'jdbc:mysql://db:3306/production',",
+                "'table-name' = 'Improves',",
+                "'username'='root',",
+                "'password'='password',",
+                "'sink.parallelism' = '1',",
+                "'sink.buffer-flush.interval' = '0',",
+                "'sink.buffer-flush.max-rows' = '10',",
+                "'sink.max-retries' = '10'"
+            ]
+        }
+    },
+    "generate_media_types": {
+        "jars": [
+            "flink-connector-jdbc-3.1.0-1.17.jar",
+            "mysql-connector-java-5.1.9.jar",
+            "flink-python-1.17.1.jar"
+        ],
+        "media_type_source": {
+            "table_name": "media_type_source",
+            "schema": [
+                "`MediaTypeID` INT,",
+                "`AvailableDiskSlot` BOOLEAN,",
+                "`IsTouchDisplay` BOOLEAN"
+            ],
+            "connector_config": [
+                "'number-of-rows' = '10',",
+                "'fields.MediaTypeID.kind' = 'sequence',",
+                "'fields.MediaTypeID.start' = '1',",
+                "'fields.MediaTypeID.end' = '10'"
+            ]
+        },
+        "media_type_jdbc_sink": {
+            "table_name": "media_type_jdbc_sink",
+            "schema": [
+                "`MediaTypeID` INT,",
+                "`AvailableDiskSlot` BOOLEAN,",
+                "`UsbSlotType` VARCHAR,",
+                "`UsbSlots` INT,",
+                "`IsTouchDisplay` BOOLEAN,",
+                "PRIMARY KEY (MediaTypeID) NOT ENFORCED"
+            ],
+            "connector_config": [
+                "'url' = 'jdbc:mysql://db:3306/production',",
+                "'table-name' = 'MediaType',",
+                "'username'='root',",
+                "'password'='password',",
+                "'sink.parallelism' = '1',",
+                "'sink.buffer-flush.interval' = '0',",
+                "'sink.buffer-flush.max-rows' = '10',",
+                "'sink.max-retries' = '10'"
+            ]
+        }
+    },
+    "generate_statuses": {
+        "jars": [
+            "flink-connector-jdbc-3.1.0-1.17.jar",
+            "mysql-connector-java-5.1.9.jar",
+            "flink-python-1.17.1.jar"
+        ],
+        "status_source_datagen_connector": {
+            "table_name": "status_source_datagen_connector",
+            "schema": [
+                "`StatusId` INT"
+            ],
+            "connector_config": [
+                "'number-of-rows' = '7',",
+                "'fields.StatusId.kind' = 'sequence',",
+                "'fields.StatusId.start' = '1',",
+                "'fields.StatusId.end' = '7'"
+            ]
+        },
+        "status_sink_datagen_connector": {
+            "table_name": "status_sink_datagen_connector",
+            "schema": [
+                "`StatusID` INT,",
+                "`StatusText` VARCHAR,",
+                "PRIMARY KEY (StatusID) NOT ENFORCED"
+            ],
+            "connector_config": [
+                "'url' = 'jdbc:mysql://db:3306/production',",
+                "'table-name' = 'Statuses',",
                 "'username'='root',",
                 "'password'='password',",
                 "'sink.parallelism' = '1',",

@@ -60,5 +60,46 @@ maps_helper = {
         'is_suspended': {'low': 0, 'high': 2},
         'suspended_reason_id': {'low': 1, 'high': 7},
         'auth_type_id': {'low': 1, 'high': 5},
+    },
+    "improves": {
+        1: ['media'],
+        2: ['media', 'speaker'],
+        3: ['media', 'speaker', 'fuel-system'],
+        4: ['media', 'speaker', 'fuel-system', 'back-seats-media'],
+        5: ['media', 'speaker', 'fuel-system', 'back-seats-media', 'shaded-windows'],
+        6: ['media', 'speaker', 'fuel-system', 'back-seats-media', 'shaded-windows', 'engine-cooler'],
+        7: ['media', 'speaker', 'fuel-system', 'back-seats-media', 'shaded-windows', 'engine-cooler', 'engine-fan'],
+        8: ['media', 'speaker', 'fuel-system', 'back-seats-media', 'shaded-windows', 'engine-cooler', 'engine-fan', 'stage-1'],
+        9: ['media', 'speaker', 'fuel-system', 'back-seats-media', 'shaded-windows', 'engine-cooler', 'engine-fan', 'stage-1', 'stage-2'],
+        10: ['media', 'speaker', 'fuel-system', 'back-seats-media', 'shaded-windows', 'engine-cooler', 'engine-fan', 'stage-1', 'stage-2', 'stage-3'],
+    },
+    "improves_stage_level": {
+        8: 'SOFTWARE',
+        9: 'SOFTWARE+ENGINE',
+        10: 'SOFTWARE+ENGINE+SHIELD',
+    },
+    "suspended_dict":{
+        '1': 'impostor',
+        '2': 'payment',
+        '3': 'hacker',
+        '4': 'scam',
+        '5': 'bot',
+        '6': 'spam',
+    },
+    "customer_type_dict": {
+        '1': 'regular',
+        '2': 'bronze',
+        '3': 'silver',
+        '4': 'gold',
+        '5': 'platinum'
+    },
+    "status_text":{
+        '1': 'activate',
+        '2': 'waiting_for_cms_approve',
+        '3': 'waiting_for_payment_approve',
+        '4': 'freeze',
+        '5': 'sold',
+        '6': 'in_publish_queue',
+        '7': 'deactivate'
     }
 }

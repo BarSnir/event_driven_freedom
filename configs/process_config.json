@@ -8,7 +8,11 @@
             "generate_vehicles",
             "generate_orders",
             "generate_images",
-            "generate_customers"
+            "generate_customers",
+            "generate_auth_types",
+            "generate_improves",
+            "generate_media_type",
+            "generate_statuses"
         ],
         "process_command": [
             "./bin/flink",
@@ -45,7 +49,9 @@
             "/usr/bin/python",
             "-pyexec",
             "/usr/bin/python",
-            "-py"
+            "--pyFiles",
+            "/opt/flink/ops",
+            "--pyModule"
         ]
     }
 }
