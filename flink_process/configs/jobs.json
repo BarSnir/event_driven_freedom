@@ -98,5 +98,47 @@
                 "'sink.max-retries' = '10'"
             ]
         }
+    },
+    "generate_orders": {
+        "jars": [
+            "flink-connector-jdbc-3.1.0-1.17.jar",
+            "mysql-connector-java-5.1.9.jar",
+            "flink-python-1.17.1.jar"
+        ],
+        "vehicles_jdbc_source": {
+            "table_name": "vehicles_jdbc_source",
+            "schema": [
+                "`OrderID` VARCHAR,",
+                "PRIMARY KEY (OrderID) NOT ENFORCED"
+            ],
+            "connector_config": [
+                "'url' = 'jdbc:mysql://db:3306/production',",
+                "'table-name' = 'Vehicles',",
+                "'username'='root',",
+                "'password'='password',",
+                "'scan.fetch-size'='500'"
+            ]
+        },
+        "orders_jdbc_sink": {
+            "table_name": "orders_jdbc_sink",
+            "schema": [
+                "`OrderID` VARCHAR,",
+                "`SiteToken` VARCHAR,",
+                "`Price` INT,",
+                "`StatusId` INT,",
+                "`CustomerId` INT,",
+                "PRIMARY KEY (OrderID) NOT ENFORCED"
+            ],
+            "connector_config": [
+                "'url' = 'jdbc:mysql://db:3306/production',",
+                "'table-name' = 'Orders',",
+                "'username'='root',",
+                "'password'='password',",
+                "'sink.parallelism' = '2',",
+                "'sink.buffer-flush.interval' = '0',",
+                "'sink.buffer-flush.max-rows' = '10',",
+                "'sink.max-retries' = '10'"
+            ]
+        }
     }
 }

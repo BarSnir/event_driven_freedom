@@ -49,5 +49,10 @@ maps_helper = {
         'prev_owner_number': {'low':0, 'high': 7},
         'media_type_id': {'low': 1, 'high': 11},
         'improve_id': {'low': 1, 'high': 11},
+    },
+    'order_ranges': {
+        'price': {'low': 1000*10, 'high': 45000*10},
+        'status_id': {'low': 1, 'high': 11},
+        'customer_id': {'low': 1, 'high': 8000},
     }
 }

@@ -1,4 +1,4 @@
-import random
+import random, string
 from datetime import date
 from pyflink.table.udf import udf
 from pyflink.table import DataTypes
@@ -53,3 +53,10 @@ class FlinkUDFs:
         today = str(date.today())
         curr_year = today[:4]
         return curr_year+'-'+str(random.randrange(1,12))+'-'+str(random.randrange(1,29))
+    
+
+    @staticmethod
+    @udf(result_type=DataTypes.STRING())
+    def get_site_token(length):
+        letters = string.ascii_lowercase
+        return ''.join(random.choice(letters) for i in range(length))
