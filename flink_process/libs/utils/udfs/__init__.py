@@ -1,4 +1,5 @@
 import random
+from datetime import date
 from pyflink.table.udf import udf
 from pyflink.table import DataTypes
 from libs.utils.udfs.maps import maps_helper
@@ -45,3 +46,10 @@ class FlinkUDFs:
             col_range.get('high')
         )
         return value
+    
+    @staticmethod 
+    @udf(result_type=DataTypes.STRING())
+    def generate_test_date():
+        today = str(date.today())
+        curr_year = today[:4]
+        return curr_year+'-'+str(random.randrange(1,12))+'-'+str(random.randrange(1,29))

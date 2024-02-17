@@ -43,5 +43,11 @@ maps_helper = {
         'security_test_level': {'low': 0, 'high': 11},
         'horse_power': {'low': 8*10, 'high': 45*10},
         'market_price': {'low': 1000*10, 'high': 45000*10},
+    },
+    'vehicles_ranges':{
+        'km': {'low': 1000*10, 'high': 45000*10},
+        'prev_owner_number': {'low':0, 'high': 7},
+        'media_type_id': {'low': 1, 'high': 11},
+        'improve_id': {'low': 1, 'high': 11},
     }
 }

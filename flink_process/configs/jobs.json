@@ -1,5 +1,5 @@
 {
-    "market_info": {
+    "generate_market_info": {
         "jars": [
             "flink-connector-jdbc-3.1.0-1.17.jar",
             "mysql-connector-java-5.1.9.jar",
@@ -43,6 +43,53 @@
             "connector_config": [
                 "'url' = 'jdbc:mysql://db:3306/production',",
                 "'table-name' = 'MarketInfo',",
+                "'username'='root',",
+                "'password'='password',",
+                "'sink.parallelism' = '2',",
+                "'sink.buffer-flush.interval' = '0',",
+                "'sink.buffer-flush.max-rows' = '10',",
+                "'sink.max-retries' = '10'"
+            ]
+        }
+    },
+    "generate_vehicles": {
+        "jars": [
+            "flink-connector-jdbc-3.1.0-1.17.jar",
+            "mysql-connector-java-5.1.9.jar",
+            "flink-python-1.17.1.jar"
+        ],
+        "market_info_jdbc_source": {
+            "table_name": "market_info_jdbc_source",
+            "schema": [
+                "`MarketInfoId` VARCHAR,",
+                "`Year` INT,",
+                "PRIMARY KEY (MarketInfoId) NOT ENFORCED"
+            ],
+            "connector_config": [
+                "'url' = 'jdbc:mysql://db:3306/production',",
+                "'table-name' = 'MarketInfo',",
+                "'username'='root',",
+                "'password'='password',",
+                "'scan.fetch-size'='500'"
+            ]
+        },
+        "vehicles_jdbc_sink": {
+            "table_name": "vehicles_jdbc_sink",
+            "schema": [
+                "`VehicleId` CHAR(36),",
+                "`KM` INT,",
+                "`PrevOwnerNumber` INT,",
+                "`MarketInfoId` VARCHAR,",
+                "`MediaTypeId` INT,",
+                "`YearOnRoad` INT,",
+                "`TestDate` DATE,",
+                "`ImproveId` INT,",
+                "`OrderId` VARCHAR NOT NULL,",
+                "PRIMARY KEY (MarketInfoId) NOT ENFORCED"
+            ],
+            "connector_config": [
+                "'url' = 'jdbc:mysql://db:3306/production',",
+                "'table-name' = 'Vehicles',",
                 "'username'='root',",
                 "'password'='password',",
                 "'sink.parallelism' = '2',",

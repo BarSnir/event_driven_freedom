@@ -1,111 +1,33 @@
 import random
-from datetime import date
-from pyflink.table.udf import udf
-from pyflink.table import ( 
-    EnvironmentSettings, 
-    TableEnvironment,
-    DataTypes,
-    expressions as F
-)
-
-@udf(result_type=DataTypes.STRING())
-def generate_test_date():
-    today = str(date.today())
-    curr_year = today[:4]
-    return curr_year+'-'+str(random.randrange(1,12))+'-'+str(random.randrange(1,29))
-
-@udf(result_type=DataTypes.INT())
-def get_int_range(text):
-    col_range_dict = {
-        'km': {'low': 1000*10, 'high': 45000*10},
-        'prev_owner_number': {'low':0, 'high': 7},
-        'media_type_id': {'low': 1, 'high': 11},
-        'improve_id': {'low': 1, 'high': 11},
-    }
-    col_range = col_range_dict.get(text, 0)
-    value = random.randrange(
-        col_range.get('low'), 
-        col_range.get('high')
-    )
-    return value
-
-def get_jars_path():
-    return f'file:///opt/flink/opt/'
-
-def get_jars_full_path() -> str:
-  jars_path = get_jars_path()
-  jars = [
-    'flink-connector-jdbc-3.1.0-1.17.jar;',
-    'mysql-connector-java-5.1.9.jar;',
-    'flink-python-1.17.1.jar'
-  ]
-  full_str = ''
-  for jar in jars:
-    full_str = f'{full_str}{jars_path}{jar}'
-  return full_str
+from pyflink.table import expressions as F
+from libs.utils.udfs import FlinkUDFs
+from libs.connectors.jdbc import FlinkJDBCConnector
+from libs.streaming import FlinkStreamingEnvironment
 
 def process():
-    environment_settings = EnvironmentSettings.in_streaming_mode()
-    t_env = TableEnvironment.create(environment_settings)
-    t_env.get_config().set('pipeline.jars',get_jars_full_path()) \
-    .set('python.fn-execution.bundle.time', '100000') \
-    .set('python.fn-execution.bundle.size', '10') \
-    .set('parallelism.default', '2')
-
-    source_ddl = """
-        CREATE TABLE MysqlSource (
-            `MarketInfoId` VARCHAR,
-            `Year` INT,
-            PRIMARY KEY (MarketInfoId) NOT ENFORCED
-        ) WITH (
-            'connector' = 'jdbc',
-            'url' = 'jdbc:mysql://db:3306/production',
-            'table-name' = 'MarketInfo',
-            'username'='root',
-            'password'='password',
-            'scan.fetch-size'='500'
-        );
-    """ 
-    sink_ddl = """
-        CREATE TABLE MysqlSink (
-            `VehicleId` CHAR(36),
-            `KM` INT,
-            `PrevOwnerNumber` INT,
-            `MarketInfoId` VARCHAR,
-            `MediaTypeId` INT,
-            `YearOnRoad` INT,
-            `TestDate` DATE,
-            `ImproveId` INT,
-            `OrderId` VARCHAR NOT NULL,
-            PRIMARY KEY (MarketInfoId) NOT ENFORCED
-        ) WITH (
-            'connector' = 'jdbc',
-            'url' = 'jdbc:mysql://db:3306/production',
-            'table-name' = 'Vehicles',
-            'username'='root',
-            'password'='password',
-            'sink.parallelism' = '2',
-            'sink.buffer-flush.interval' = '0',
-            'sink.buffer-flush.max-rows' = '10',
-            'sink.max-retries' = '10'
-        );
-    """
-    source_table =t_env.execute_sql(source_ddl)
-    sink_table = t_env.execute_sql(sink_ddl)
-    market_info_table = t_env.from_path('MysqlSource')
+    streaming_env = FlinkStreamingEnvironment('generate_vehicles')
+    job_config = streaming_env.job_config
+    table_env = streaming_env.get_table_streaming_environment(parallelism=2)
+    market_info_jdbc_source = FlinkJDBCConnector(job_config.get('market_info_jdbc_source'))
+    vehicles_jdbc_sink = FlinkJDBCConnector(job_config.get('vehicles_jdbc_sink'))
+    source_ddl = market_info_jdbc_source.generate_jdbc_connector()
+    sink_ddl = vehicles_jdbc_sink.generate_jdbc_connector()
+    market_info_source = table_env.execute_sql(source_ddl)
+    vehicles_sink = table_env.execute_sql(sink_ddl)
+    market_info_table = table_env.from_path(market_info_jdbc_source.table_name)
     for i in range(10):
         market_info_table_execution = market_info_table.select(
             F.uuid().alias('VehicleId'),
-            get_int_range('km').alias('KM'),
-            get_int_range('prev_owner_number').alias('PrevOwnerNumber'),
+            FlinkUDFs.get_int_range('km', 'vehicles_ranges').alias('KM'),
+            FlinkUDFs.get_int_range('prev_owner_number', 'vehicles_ranges').alias('PrevOwnerNumber'),
             F.col('MarketInfoId'),
-            get_int_range('media_type_id').alias('MediaTypeId'),
+            FlinkUDFs.get_int_range('media_type_id', 'vehicles_ranges').alias('MediaTypeId'),
             (F.col('Year')+ random.randrange(0,2)).alias('YearOnRoad'),
-            F.to_date(generate_test_date()).alias('TestDate'),
-            get_int_range('improve_id').alias('ImproveId'),
+            F.to_date(FlinkUDFs.generate_test_date()).alias('TestDate'),
+            FlinkUDFs.get_int_range('improve_id', 'vehicles_ranges').alias('ImproveId'),
         ).add_columns(F.col('VehicleId').replace('-','').alias('OrderId'))
-        market_info_table_execution.execute_insert("MysqlSink").wait()
-    source_table.collect().close()
-    sink_table.collect().close()
+        market_info_table_execution.execute_insert(vehicles_jdbc_sink.table_name).wait()
+    market_info_source.collect().close()
+    vehicles_sink.collect().close()
 if __name__ == "__main__":
     process()

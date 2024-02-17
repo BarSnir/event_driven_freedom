@@ -5,7 +5,7 @@ from pyflink.table import DataTypes, expressions as F
 from libs.connectors.file_system import FlinkFileSystemConnector
 
 def process():
-    streaming_env = FlinkStreamingEnvironment('market_info')
+    streaming_env = FlinkStreamingEnvironment('generate_market_info')
     job_config = streaming_env.job_config
     table_env = streaming_env.get_table_streaming_environment(parallelism=2)
     source_connector = FlinkFileSystemConnector(job_config.get('market_info_csv'))
