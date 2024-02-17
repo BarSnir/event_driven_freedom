@@ -54,5 +54,11 @@ maps_helper = {
         'price': {'low': 1000*10, 'high': 45000*10},
         'status_id': {'low': 1, 'high': 11},
         'customer_id': {'low': 1, 'high': 8000},
+    },
+    "customer_ranges":{
+        'customer_type_id': {'low': 1, 'high': 6},
+        'is_suspended': {'low': 0, 'high': 2},
+        'suspended_reason_id': {'low': 1, 'high': 7},
+        'auth_type_id': {'low': 1, 'high': 5},
     }
 }

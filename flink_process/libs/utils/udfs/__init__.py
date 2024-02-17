@@ -65,3 +65,38 @@ class FlinkUDFs:
     @udf(result_type=DataTypes.INT())
     def get_num_of_slots():
         return random.randrange(1,5)
+    
+    @staticmethod
+    @udf(result_type=DataTypes.STRING())
+    def get_join_date():
+        year = str(random.randrange(2020,2024))
+        month = str(random.randrange(1,12))
+        day = str(random.randrange(1,29))
+        return year+'-'+month+'-'+day
+
+    @staticmethod
+    @udf(result_type=DataTypes.STRING())
+    def generate_password(length):
+        letters = string.ascii_lowercase
+        return ''.join(random.choice(letters) for i in range(length))
+    
+    @staticmethod
+    @udf(result_type=DataTypes.STRING())
+    def get_customer_type_text(dict_type, id):
+        suspended_dict = {
+        '1': 'impostor',
+        '2': 'payment',
+        '3': 'hacker',
+        '4': 'scam',
+        '5': 'bot',
+        '6': 'spam',
+        }
+        customer_type_dict = {
+        '1': 'regular',
+        '2': 'bronze',
+        '3': 'silver',
+        '4': 'gold',
+        '5': 'platinum',
+        }
+        abstract_dict = locals()[f'{dict_type}_dict']
+        return abstract_dict.get(str(id))

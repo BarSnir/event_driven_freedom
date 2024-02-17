@@ -181,5 +181,64 @@
                 "'sink.max-retries' = '10'"
             ]
         }
+    },
+    "generate_customers": {
+        "jars": [
+            "flink-connector-jdbc-3.1.0-1.17.jar",
+            "mysql-connector-java-5.1.9.jar",
+            "flink-python-1.17.1.jar"
+        ],
+        "customers_csv_source": {
+            "table_name": "customers_csv_source",
+            "schema": [
+                "`first_name` VARCHAR,",
+                "`last_name` VARCHAR,",
+                "`email` VARCHAR"
+            ],
+            "path": "file:///opt/flink/datasets/customers"
+        },
+        "orders_jdbc_source": {
+            "table_name": "orders_jdbc_source",
+            "schema": [
+                "`CustomerId` INT,",
+                "PRIMARY KEY (CustomerId) NOT ENFORCED"
+            ],
+            "connector_config": [
+                "'url' = 'jdbc:mysql://db:3306/production',",
+                "'table-name' = 'Orders',",
+                "'username'='root',",
+                "'password'='password',",
+                "'scan.fetch-size'='500'"
+            ]
+        },
+        "customers_jdbc_sink": {
+            "table_name": "customers_jdbc_sink",
+            "schema": [
+                "`CustomerId` INT,",
+                "`FirstName` VARCHAR,",
+                "`LastName` VARCHAR,",
+                "`Email` VARCHAR,",
+                "`CustomerTypeId` INT,",
+                "`JoinDate` DATE,",
+                "`IsSuspended` INT,",
+                "`SuspendedReasonId` INT,",
+                "`Password` VARCHAR,",
+                "`AuthTypeId` INT,",
+                "`CustomerTypeText` VARCHAR,",
+                "`SuspendedReasonText` VARCHAR,",
+                "`ProfileImage` VARCHAR,",
+                "PRIMARY KEY (CustomerId) NOT ENFORCED"
+            ],
+            "connector_config": [
+                "'url' = 'jdbc:mysql://db:3306/production',",
+                "'table-name' = 'Customers',",
+                "'username'='root',",
+                "'password'='password',",
+                "'sink.parallelism' = '1',",
+                "'sink.buffer-flush.interval' = '0',",
+                "'sink.buffer-flush.max-rows' = '10',",
+                "'sink.max-retries' = '10'"
+            ]
+        }
     }
 }

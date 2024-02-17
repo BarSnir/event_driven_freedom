@@ -10,9 +10,9 @@ SCHEMA = DataTypes.ROW([
     DataTypes.FIELD("Url", DataTypes.STRING())
 ])
 
-order_id_list = []
-
 def process():
+    rows = []
+    order_id_list =[]
     streaming_env = FlinkStreamingEnvironment('generate_images')
     job_config = streaming_env.job_config
     table_env = streaming_env.get_table_streaming_environment(parallelism=3)
@@ -23,14 +23,11 @@ def process():
     sink_ddl = images_jdbc_sink.generate_jdbc_connector()
     table_env.execute_sql(source_ddl)
     table_env.execute_sql(sink_ddl)
-
     panda_table = table_env.from_path(orders_jdbc_source.table_name).to_pandas()
     for item in panda_table.to_dict(orient='records'):
        order_id_list.append(item['OrderID'])
-
-    rows = []
     for order_id in order_id_list:
-       for image_number in range(random.randrange(1,5)):
+       for image_number in range(random.randrange(1, 10)):
           letters = string.ascii_lowercase
           token = ''.join(random.choice(letters) for i in range(16))
           rows.append((token, order_id, image_number+1, f'site-url/{token}'))

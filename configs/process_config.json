@@ -6,7 +6,9 @@
         "process_list": [
             "generate_market_info",
             "generate_vehicles",
-            "generate_orders"
+            "generate_orders",
+            "generate_images",
+            "generate_customers"
         ],
         "process_command": [
             "./bin/flink",
