@@ -27,8 +27,8 @@ def process(logger, backoff_seconds=120):
                     stdout=null_logging,
                     stderr=null_logging
                 )
-                logger.info(f"Done!")
                 time.sleep(backoff_seconds)
+                logger.info(f"Done!")
     except IOError as ioe:
         logger.error("IO exception with trace:")
         logger.exception(ioe)
