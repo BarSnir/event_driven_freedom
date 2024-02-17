@@ -398,5 +398,164 @@
                 "'sink.max-retries' = '10'"
             ]
         }
+    },
+    "aggregate_images": {
+        "jars": [
+            "flink-sql-connector-kafka-3.0.0-1.17.jar",
+            "flink-sql-avro-1.17.1.jar",
+            "flink-sql-avro-confluent-registry-1.17.1.jar"
+        ],
+        "images_topic": {
+            "table_name": "images_topic",
+            "schema": [
+                "`ImageId` VARCHAR,",
+                "`OrderId` VARCHAR,",
+                "`Url` VARCHAR,",
+                "`Priority` INT,",
+                "`ts` TIMESTAMP(3) METADATA FROM 'timestamp',",
+                "PRIMARY KEY (ImageId) NOT ENFORCED"
+            ],
+            "connector_config": [
+                "'topic' = 'Images',",
+                "'properties.bootstrap.servers' = 'broker:29092',",
+                "'value.format' = 'debezium-avro-confluent',",
+                "'value.debezium-avro-confluent.url' = 'http://schema-registry:8082',",
+                "'properties.group.id'='one_consumer_v1',",
+                "'properties.max.message.bytes'='3000000',",
+                "'scan.startup.mode'='earliest-offset'"
+            ]
+        },
+        "aggregate_topic": {
+            "table_name": "aggregate_topic",
+            "schema": [
+                "`images_order_id` VARCHAR,",
+                "`images_count` BIGINT,",
+                "`images_urls` VARCHAR,",
+                "PRIMARY KEY (images_order_id) NOT ENFORCED"
+            ],
+            "connector_config": [
+                "'key.format' = 'raw',",
+                "'topic' = 'aggregate_images',",
+                "'properties.bootstrap.servers' = 'broker:29092',",
+                "'value.format' = 'avro-confluent',",
+                "'value.avro-confluent.url' = 'http://schema-registry:8082',",
+                "'sink.parallelism' = '1',",
+                "'properties.auto.register.schemas'= 'true',",
+                "'properties.use.latest.version'= 'true',",
+                "'properties.max.block.ms' = '600000',",
+                "'sink.buffer-flush.interval' = '60000',",
+                "'sink.buffer-flush.max-rows' = '100000000'"
+            ]
+        }
+    },
+    "enrich_full_orders": {
+        "jars": [
+            "flink-sql-connector-kafka-3.0.0-1.17.jar",
+            "flink-sql-avro-1.17.1.jar",
+            "flink-sql-avro-confluent-registry-1.17.1.jar"
+        ],
+        "orders_topic": {
+            "table_name": "orders_topic",
+            "schema": [
+                "`OrderId` VARCHAR,",
+                "`CustomerId` INT,",
+                "`SiteToken` VARCHAR,",
+                "`StatusId` INT,",
+                "`Price` INT,",
+                "`ts` TIMESTAMP(3) METADATA FROM 'timestamp',",
+                "PRIMARY KEY (OrderId) NOT ENFORCED"
+            ],
+            "connector_config": [
+                "'topic' = 'Orders',",
+                "'properties.bootstrap.servers' = 'broker:29092',",
+                "'value.format' = 'debezium-avro-confluent',",
+                "'value.debezium-avro-confluent.url' = 'http://schema-registry:8082',",
+                "'properties.group.id'='orders_enrich_consumer_v1',",
+                "'properties.max.message.bytes'='3000000',",
+                "'scan.startup.mode'='earliest-offset'"
+            ]
+        },
+        "aggregate_topic": {
+            "table_name": "aggregate_topic",
+            "schema": [
+                "`images_order_id` VARCHAR,",
+                "`images_count` BIGINT,",
+                "`images_urls` VARCHAR"
+            ],
+            "connector_config": [
+                "'topic' = 'aggregate_images',",
+                "'properties.bootstrap.servers' = 'broker:29092',",
+                "'value.format' = 'avro-confluent',",
+                "'value.avro-confluent.url' = 'http://schema-registry:8082',",
+                "'properties.group.id'='agg_images_consumer_v1',",
+                "'properties.max.message.bytes'='3000000',",
+                "'scan.startup.mode'='earliest-offset'"
+            ]
+        },
+        "customers_topic": {
+            "table_name": "customers_topic",
+            "schema": [
+                "`CustomerId` INT,",
+                "`FirstName` VARCHAR,",
+                "`LastName` VARCHAR,",
+                "`Email` VARCHAR,",
+                "`CustomerTypeId` INT,",
+                "`CustomerTypeText` VARCHAR,",
+                "`JoinDate` DATE,",
+                "`ProfileImage` VARCHAR,",
+                "`IsSuspended` INT,",
+                "`SuspendedReasonId` INT,",
+                "`SuspendedReasonText` VARCHAR,",
+                "`AuthTypeId` INT,",
+                "`ts` TIMESTAMP(3) METADATA FROM 'timestamp',",
+                "PRIMARY KEY (CustomerId) NOT ENFORCED"
+            ],
+            "connector_config": [
+                "'topic' = 'Customers',",
+                "'properties.bootstrap.servers' = 'broker:29092',",
+                "'value.format' = 'debezium-avro-confluent',",
+                "'value.debezium-avro-confluent.url' = 'http://schema-registry:8082',",
+                "'properties.group.id'='customers_consumer_v1',",
+                "'properties.max.message.bytes'='3000000',",
+                "'scan.startup.mode'='earliest-offset'"
+            ]
+        },
+        "full_order_topic": {
+            "table_name": "full_order_topic",
+            "schema": [
+                "`order_id` VARCHAR,",
+                "`customer_id` INT,",
+                "`site_token` VARCHAR,",
+                "`status_id` INT,",
+                "`price` INT,",
+                "`images_urls` VARCHAR,",
+                "`images_count` BIGINT,",
+                "`first_name` VARCHAR,",
+                "`last_name` VARCHAR,",
+                "`email` VARCHAR,",
+                "`customer_type_id` INT,",
+                "`customer_type_text` VARCHAR,",
+                "`join_date` DATE,",
+                "`profile_image` VARCHAR,",
+                "`is_suspended` INT,",
+                "`suspended_reason_id` INT,",
+                "`suspended_reason_text` VARCHAR,",
+                "`auth_type_id` INT,",
+                "PRIMARY KEY (order_id) NOT ENFORCED"
+            ],
+            "connector_config": [
+                "'key.format' = 'raw',",
+                "'topic' = 'full_orders',",
+                "'properties.bootstrap.servers' = 'broker:29092',",
+                "'value.format' = 'avro-confluent',",
+                "'value.avro-confluent.url' = 'http://schema-registry:8082',",
+                "'sink.parallelism' = '1',",
+                "'properties.auto.register.schemas'= 'true',",
+                "'properties.use.latest.version'= 'true',",
+                "'properties.max.block.ms' = '600000',",
+                "'sink.buffer-flush.interval' = '100',",
+                "'sink.buffer-flush.max-rows' = '100'"
+            ]
+        }
     }
 }

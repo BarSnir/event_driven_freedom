@@ -1,143 +1,27 @@
-import os
-from pyflink.table import TableEnvironment, EnvironmentSettings
 from pyflink.table import expressions as F 
-from pyflink.table.expression import DataTypes
-
-def get_jars_path():
-    return f'file:///opt/flink/opt/'
-
-def get_env(key:str, default:str) -> str: 
-  return os.getenv(key, default)
-
-def get_jars_full_path() -> str:
-  jars_path = get_jars_path()
-  jars = [
-    'flink-sql-connector-kafka-3.0.0-1.17.jar;',
-    'flink-sql-avro-1.17.1.jar;',
-    'flink-sql-avro-confluent-registry-1.17.1.jar'
-  ]
-  full_str = ''
-  for jar in jars:
-    full_str = f'{full_str}{jars_path}{jar}'
-  return full_str
-
+from libs.connectors.kafka import FlinkKafkaConnector
+from libs.streaming import FlinkStreamingEnvironment
 
 def log_processing():
-    print(f'Flink version:')
-    kafka_orders_ddl = """
-        CREATE TABLE orders (
-            `OrderId` VARCHAR,
-            `CustomerId` INT,
-            `SiteToken` VARCHAR,
-            `StatusId` INT,
-            `Price` INT,
-            `ts` TIMESTAMP(3) METADATA FROM 'timestamp',
-            PRIMARY KEY (OrderId) NOT ENFORCED
-        ) WITH (
-            'connector' = 'kafka',
-            'topic' = 'Orders',
-            'properties.bootstrap.servers' = 'broker:29092',
-            'value.format' = 'debezium-avro-confluent',
-            'value.debezium-avro-confluent.url' = 'http://schema-registry:8082',
-            'properties.group.id'='orders_consumer_v1',
-            'properties.max.message.bytes'='3000000',
-            'scan.startup.mode'='earliest-offset'
-        )
-    """
-    kafka_images_ddl = """
-        CREATE TABLE aggregate_images (
-            `images_order_id` VARCHAR,
-            `images_count` BIGINT,
-            `images_urls` VARCHAR
-        ) WITH (
-            'connector' = 'kafka',
-            'topic' = 'aggregate_images',
-            'properties.bootstrap.servers' = 'broker:29092',
-            'value.format' = 'avro-confluent',
-            'value.avro-confluent.url' = 'http://schema-registry:8082',
-            'properties.group.id'='agg_images_consumer_v1',
-            'properties.max.message.bytes'='3000000',
-            'scan.startup.mode'='earliest-offset'
-        )
-    """
-    kafka_customers_ddl = """
-        CREATE TABLE Customers (
-            `CustomerId` INT,
-            `FirstName` VARCHAR,
-            `LastName` VARCHAR,
-            `Email` VARCHAR,
-            `CustomerTypeId` INT,
-            `CustomerTypeText` VARCHAR,
-            `JoinDate` DATE,
-            `ProfileImage` VARCHAR,
-            `IsSuspended` INT,
-            `SuspendedReasonId` INT,
-            `SuspendedReasonText` VARCHAR,
-            `AuthTypeId` INT,
-            `ts` TIMESTAMP(3) METADATA FROM 'timestamp',
-            PRIMARY KEY (CustomerId) NOT ENFORCED
-        ) WITH (
-            'connector' = 'kafka',
-            'topic' = 'Customers',
-            'properties.bootstrap.servers' = 'broker:29092',
-            'value.format' = 'debezium-avro-confluent',
-            'value.debezium-avro-confluent.url' = 'http://schema-registry:8082',
-            'properties.group.id'='customers_consumer_v1',
-            'properties.max.message.bytes'='3000000',
-            'scan.startup.mode'='earliest-offset'
-        )
-    """
-    kafka_full_order_ddl = """
-        CREATE TABLE full_orders (
-            `order_id` VARCHAR,
-            `customer_id` INT,
-            `site_token` VARCHAR,
-            `status_id` INT,
-            `price` INT,
-            `images_urls` VARCHAR,
-            `images_count` BIGINT,
-            `first_name` VARCHAR,
-            `last_name` VARCHAR,
-            `email` VARCHAR,
-            `customer_type_id` INT,
-            `customer_type_text` VARCHAR,
-            `join_date` DATE,
-            `profile_image` VARCHAR,
-            `is_suspended` INT,
-            `suspended_reason_id` INT,
-            `suspended_reason_text` VARCHAR,
-            `auth_type_id` INT,
-            PRIMARY KEY (order_id) NOT ENFORCED
-        ) WITH (
-            'connector' = 'upsert-kafka',
-            'key.format' = 'raw',
-            'topic' = 'full_orders',
-            'properties.bootstrap.servers' = 'broker:29092',
-            'value.format' = 'avro-confluent',
-            'value.avro-confluent.url' = 'http://schema-registry:8082',
-            'sink.parallelism' = '1',
-            'properties.auto.register.schemas'= 'true',
-            'properties.use.latest.version'= 'true',
-            'properties.max.block.ms' = '600000',
-            'sink.buffer-flush.interval' = '100',
-            'sink.buffer-flush.max-rows' = '100'
-        )
-    """
-    env_settings = EnvironmentSettings.new_instance() \
-      .in_streaming_mode().build()
-    t_env = TableEnvironment.create(env_settings)
-    t_env.get_config().set('pipeline.jars',get_jars_full_path()) \
-    .set("parallelism.default", get_env('PARALLELISM', '1')) \
-    .set("table.display.max-column-width", '2000')
+    streaming_env = FlinkStreamingEnvironment('generate_market_info')
+    job_config = streaming_env.job_config
+    table_env = streaming_env.get_table_streaming_environment(parallelism=1)
+    orders_topic_connector = FlinkKafkaConnector(job_config.get('orders_topic'))
+    aggregate_topic_connector = FlinkKafkaConnector(job_config.get('aggregate_topic'))
+    customers_topic_connector = FlinkKafkaConnector(job_config.get('customers_topic'))
+    full_order_topic_connector = FlinkKafkaConnector(job_config.get('full_order_topic'))
+    kafka_orders_ddl = orders_topic_connector.generate_kafka_connector('kafka')
+    kafka_images_ddl = aggregate_topic_connector.generate_kafka_connector('kafka')
+    kafka_customers_ddl = customers_topic_connector.generate_kafka_connector('kafka')
+    kafka_full_order_ddl =  full_order_topic_connector.generate_kafka_connector('upsert-kafka')
 
-    t_env.execute_sql(kafka_orders_ddl)
-    t_env.execute_sql(kafka_images_ddl)
-    t_env.execute_sql(kafka_customers_ddl)
-    t_env.execute_sql(kafka_full_order_ddl)
+    for ddl in [kafka_orders_ddl, kafka_images_ddl, kafka_customers_ddl, kafka_full_order_ddl]:
+        table_env.execute_sql(ddl)
 
-    order_table = t_env.from_path('orders')
-    images_table = t_env.from_path('aggregate_images')
-    customers = t_env.from_path('Customers').select(
+    order_table = table_env.from_path(orders_topic_connector.table_name)
+    images_table = table_env.from_path(aggregate_topic_connector.table_name)
+    customers = table_env.from_path(customers_topic_connector.table_name) \
+    .select(
        F.col('CustomerId').alias('customer_id_table'),
         F.col('FirstName').alias('first_name'),
         F.col('LastName').alias('last_name'),
@@ -151,7 +35,8 @@ def log_processing():
         F.col('SuspendedReasonText').alias('suspended_reason_text'),
         F.col('AuthTypeId').alias('auth_type_id')
     )
-    full_order = order_table.join(images_table).where(F.col('OrderId') == F.col('images_order_id')) \
+    full_order = order_table.join(images_table) \
+    .where(F.col('OrderId') == F.col('images_order_id')) \
     .drop_columns(F.col('images_order_id')) \
     .select(
        F.col('OrderId').alias('order_id'),
@@ -163,6 +48,7 @@ def log_processing():
         F.col('images_count')
     ).join(customers).where(F.col('customer_id') == F.col('customer_id_table')) \
     .drop_columns(F.col('customer_id_table'))
-    full_order.execute_insert('full_orders').wait()
+    full_order.execute_insert(full_order_topic_connector.table_name).wait()
+
 if __name__ == '__main__':
     log_processing()

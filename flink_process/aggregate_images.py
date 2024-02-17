@@ -1,82 +1,23 @@
-import os
-from pyflink.table import TableEnvironment, EnvironmentSettings
 from pyflink.table import expressions as F 
 from pyflink.table.expression import DataTypes
-
-def get_jars_path():
-    return f'file:///opt/flink/opt/'
-
-def get_env(key:str, default:str) -> str: 
-  return os.getenv(key, default)
-
-def get_jars_full_path() -> str:
-  jars_path = get_jars_path()
-  jars = [
-    'flink-sql-connector-kafka-3.0.0-1.17.jar;',
-    'flink-sql-avro-1.17.1.jar;',
-    'flink-sql-avro-confluent-registry-1.17.1.jar'
-  ]
-  full_str = ''
-  for jar in jars:
-    full_str = f'{full_str}{jars_path}{jar}'
-  return full_str
-
+from libs.connectors.kafka import FlinkKafkaConnector
+from libs.streaming import FlinkStreamingEnvironment
 
 def log_processing():
-    kafka_images_ddl = """
-        CREATE TABLE images (
-            `ImageId` VARCHAR,
-            `OrderId` VARCHAR,
-            `Url` VARCHAR,
-            `Priority` INT,
-            `ts` TIMESTAMP(3) METADATA FROM 'timestamp',
-            PRIMARY KEY (ImageId) NOT ENFORCED
-        ) WITH (
-            'connector' = 'kafka',
-            'topic' = 'Images',
-            'properties.bootstrap.servers' = 'broker:29092',
-            'value.format' = 'debezium-avro-confluent',
-            'value.debezium-avro-confluent.url' = 'http://schema-registry:8082',
-            'properties.group.id'='one_consumer_v1',
-            'properties.max.message.bytes'='3000000',
-            'scan.startup.mode'='earliest-offset'
-        )
-    """
-    kafka_agg_images_ddl = """
-        CREATE TABLE aggregate_images (
-            `images_order_id` VARCHAR,
-            `images_count` BIGINT,
-            `images_urls` VARCHAR,
-            PRIMARY KEY (images_order_id) NOT ENFORCED
-        ) WITH (
-            'connector' = 'upsert-kafka',
-            'key.format' = 'raw',
-            'topic' = 'aggregate_images',
-            'properties.bootstrap.servers' = 'broker:29092',
-            'value.format' = 'avro-confluent',
-            'value.avro-confluent.url' = 'http://schema-registry:8082',
-            'sink.parallelism' = '1',
-            'properties.auto.register.schemas'= 'true',
-            'properties.use.latest.version'= 'true',
-            'properties.max.block.ms' = '600000',
-            'sink.buffer-flush.interval' = '60000',
-            'sink.buffer-flush.max-rows' = '100000000'
-        )
-    """
-    env_settings = EnvironmentSettings.new_instance() \
-      .in_streaming_mode().build()
-    t_env = TableEnvironment.create(env_settings)
-    t_env.get_config().set('pipeline.jars',get_jars_full_path()) \
-    .set("parallelism.default", get_env('PARALLELISM', '1')) \
-    .set("table.display.max-column-width", '2000')
+    streaming_env = FlinkStreamingEnvironment('generate_market_info')
+    job_config = streaming_env.job_config
+    table_env = streaming_env.get_table_streaming_environment(parallelism=1)
+    images_topic_connector = FlinkKafkaConnector(job_config.get('images_topic'))
+    aggregate_topic_connector = FlinkKafkaConnector(job_config.get('aggregate_topic'))
+    kafka_images_ddl = images_topic_connector.generate_kafka_connector("kafka")
+    kafka_agg_images_ddl = aggregate_topic_connector.generate_kafka_connector("upsert-kafka")
+    table_env.execute_sql(kafka_images_ddl)
+    table_env.execute_sql(kafka_agg_images_ddl)
 
-    t_env.execute_sql(kafka_images_ddl)
-    t_env.execute_sql(kafka_agg_images_ddl)
-
-    images_table = t_env.from_path('images') \
+    images_table = table_env.from_path(images_topic_connector.table_name) \
     .rename_columns(F.col('OrderId').alias('ImageOrderId')) \
     .add_columns(F.col('Priority').cast(DataTypes.STRING()).alias('ImagePriority')) \
-    .add_columns(F.concat(F.col('Url'), '_', F.col('ImagePriority')).alias    ('ImagePriorityAgg')) \
+    .add_columns(F.concat(F.col('Url'), '_', F.col('ImagePriority')).alias('ImagePriorityAgg')) \
     .drop_columns(F.col('Priority'), F.col('Url'), F.col('ImageId')) \
     .group_by(F.col('ImageOrderId')) \
     .select(
@@ -84,6 +25,7 @@ def log_processing():
       F.col('ImagePriorityAgg').count.alias('images_count'),
       F.col('ImagePriorityAgg').list_agg(',').alias('images_urls')
     )
-    images_table.execute_insert('aggregate_images').wait()
+    images_table.execute_insert(aggregate_topic_connector.table_name).wait()
+
 if __name__ == '__main__':
     log_processing()

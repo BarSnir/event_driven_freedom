@@ -23,7 +23,6 @@ def get_jars_full_path() -> str:
 
 
 def log_processing():
-    print(f'Flink version:')
     kafka_vehicles_ddl = """
         CREATE TABLE vehicles (
             `VehicleId` VARCHAR,
