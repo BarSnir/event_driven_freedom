@@ -11,7 +11,7 @@ def process():
     status_source_datagen_connector = FlinkDatagenConnector(job_config.get('status_source_datagen_connector'))
     status_sink_datagen_connector = FlinkJDBCConnector(job_config.get('status_sink_datagen_connector'))
     source_ddl = status_source_datagen_connector.generate_datagen_connector()
-    sink_ddl = status_sink_datagen_connector.generate_datagen_connector()
+    sink_ddl = status_sink_datagen_connector.generate_jdbc_connector()
     source_table = table_env.execute_sql(source_ddl)
     sink_table = table_env.execute_sql(sink_ddl)
     table_env.from_path(status_source_datagen_connector.table_name).select(

@@ -2,7 +2,6 @@
     "batch": {
         "host": "jobmanager",
         "port:": "8081",
-        "ops_prefix": "/opt/flink/ops",
         "process_list": [
             "generate_market_info",
             "generate_vehicles",
@@ -32,12 +31,11 @@
     "stream": {
         "host": "jobmanager",
         "port:": "8081",
-        "ops_prefix": "/opt/flink/ops",
         "process_list": [
-            "aggregate_images.py",
-            "enrich_full_order.py",
-            "enrich_full_vehicle.py",
-            "full_ad_enrich.py"
+            "aggregate_images",
+            "enrich_full_order",
+            "enrich_full_vehicle",
+            "full_ad_enrich"
         ],
         "process_command": [
             "./bin/flink",
