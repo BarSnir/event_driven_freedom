@@ -60,3 +60,8 @@ class FlinkUDFs:
     def get_site_token(length):
         letters = string.ascii_lowercase
         return ''.join(random.choice(letters) for i in range(length))
+    
+    @staticmethod
+    @udf(result_type=DataTypes.INT())
+    def get_num_of_slots():
+        return random.randrange(1,5)

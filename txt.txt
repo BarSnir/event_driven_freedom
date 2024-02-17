@@ -1,5 +1,0 @@
-    environment:
-      …
-      CONNECT_PLUGIN_PATH: '/usr/share/java,/data/connectors/'
-    volumes:
-      - /path/on/docker/host/to/connector/folder:/data

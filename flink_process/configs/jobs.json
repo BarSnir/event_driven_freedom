@@ -140,5 +140,46 @@
                 "'sink.max-retries' = '10'"
             ]
         }
+    },
+    "generate_images": {
+        "jars": [
+            "flink-connector-jdbc-3.1.0-1.17.jar",
+            "mysql-connector-java-5.1.9.jar",
+            "flink-python-1.17.1.jar"
+        ],
+        "orders_jdbc_source": {
+            "table_name": "orders_jdbc_source",
+            "schema": [
+                "`OrderID` VARCHAR,",
+                "PRIMARY KEY (OrderID) NOT ENFORCED"
+            ],
+            "connector_config": [
+                "'url' = 'jdbc:mysql://db:3306/production',",
+                "'table-name' = 'Orders',",
+                "'username'='root',",
+                "'password'='password',",
+                "'scan.fetch-size'='500'"
+            ]
+        },
+        "images_jdbc_sink": {
+            "table_name": "images_jdbc_sink",
+            "schema": [
+                "`ImageId` VARCHAR,",
+                "`OrderId` VARCHAR,",
+                "`Priority` INT,",
+                "`Url` VARCHAR,",
+                "PRIMARY KEY (ImageId) NOT ENFORCED"
+            ],
+            "connector_config": [
+                "'url' = 'jdbc:mysql://db:3306/production',",
+                "'table-name' = 'Images',",
+                "'username'='root',",
+                "'password'='password',",
+                "'sink.parallelism' = '3',",
+                "'sink.buffer-flush.interval' = '10000',",
+                "'sink.buffer-flush.max-rows' = '10000',",
+                "'sink.max-retries' = '10'"
+            ]
+        }
     }
 }
