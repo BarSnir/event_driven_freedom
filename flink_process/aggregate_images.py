@@ -4,7 +4,7 @@ from libs.connectors.kafka import FlinkKafkaConnector
 from libs.streaming import FlinkStreamingEnvironment
 
 def log_processing():
-    streaming_env = FlinkStreamingEnvironment('generate_market_info')
+    streaming_env = FlinkStreamingEnvironment('aggregate_images')
     job_config = streaming_env.job_config
     table_env = streaming_env.get_table_streaming_environment(parallelism=1)
     images_topic_connector = FlinkKafkaConnector(job_config.get('images_topic'))

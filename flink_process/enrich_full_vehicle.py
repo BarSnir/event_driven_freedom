@@ -1,186 +1,21 @@
-import os
-from pyflink.table import TableEnvironment, EnvironmentSettings
 from pyflink.table import expressions as F 
-from pyflink.table.expression import DataTypes
-
-def get_jars_path():
-    return f'file:///opt/flink/opt/'
-
-def get_env(key:str, default:str) -> str: 
-  return os.getenv(key, default)
-
-def get_jars_full_path() -> str:
-  jars_path = get_jars_path()
-  jars = [
-    'flink-sql-connector-kafka-3.0.0-1.17.jar;',
-    'flink-sql-avro-1.17.1.jar;',
-    'flink-sql-avro-confluent-registry-1.17.1.jar'
-  ]
-  full_str = ''
-  for jar in jars:
-    full_str = f'{full_str}{jars_path}{jar}'
-  return full_str
-
+from libs.connectors.kafka import FlinkKafkaConnector
+from libs.streaming import FlinkStreamingEnvironment
 
 def log_processing():
-    kafka_vehicles_ddl = """
-        CREATE TABLE vehicles (
-            `VehicleId` VARCHAR,
-            `KM` INT,
-            `PrevOwnerNumber` TINYINT,
-            `OrderId` VARCHAR,
-            `MarketInfoId` VARCHAR,
-            `MediaTypeId` INT,
-            `YearOnRoad` INT,
-            `TestDate` DATE,
-            `ImproveId` INT,
-            PRIMARY KEY (VehicleId) NOT ENFORCED
-        ) WITH (
-            'connector' = 'kafka',
-            'topic' = 'Vehicles',
-            'properties.bootstrap.servers' = 'broker:29092',
-            'value.format' = 'debezium-avro-confluent',
-            'value.debezium-avro-confluent.url' = 'http://schema-registry:8082',
-            'properties.group.id'='vehicles_consumer_v1',
-            'properties.max.message.bytes'='3000000',
-            'scan.startup.mode'='earliest-offset'
-        )
-    """
-    kafka_market_info_ddl = """
-        CREATE TABLE market_info (
-            `MarketInfoId` VARCHAR,
-            `AirBags` INT,
-            `SunRoof` TINYINT,
-            `MagnesiumWheels` TINYINT,
-            `ReversSensors` TINYINT,
-            `ABS` TINYINT,
-            `Hybrid` TINYINT,
-            `Doors` TINYINT,
-            `EnvironmentFriendlyLevel` INT,
-            `SecurityTestLevel` INT,
-            `ManufacturerId` INT,
-            `ManufacturerText` VARCHAR,
-            `ModelId` INT,
-            `ModelText` VARCHAR,
-            `SubModelId` INT,
-            `SubModelText` VARCHAR,
-            `Year` INT,
-            `HorsePower` INT,
-            `CruseControl` TINYINT,
-            `PowerWheel` TINYINT,
-            `FullyAutonomic` TINYINT,
-            `MarketPrice` INT,
-            PRIMARY KEY (MarketInfoId) NOT ENFORCED
-        ) WITH (
-            'connector' = 'kafka',
-            'topic' = 'MarketInfo',
-            'properties.bootstrap.servers' = 'broker:29092',
-            'value.format' = 'debezium-avro-confluent',
-            'value.debezium-avro-confluent.url' = 'http://schema-registry:8082',
-            'properties.group.id'='market_info_consumer_v1',
-            'properties.max.message.bytes'='3000000',
-            'scan.startup.mode'='earliest-offset'
-        )
-    """
-    kafka_media_type_ddl = """
-        CREATE TABLE media_types (
-            `MediaTypeId` INT,
-            `AvailableDiskSlot` INT,
-            `UsbSlotType` VARCHAR,
-            `UsbSlots` INT,
-            `IsTouchDisplay` INT,
-            PRIMARY KEY (MediaTypeId) NOT ENFORCED
-        ) WITH (
-            'connector' = 'kafka',
-            'topic' = 'MediaType',
-            'properties.bootstrap.servers' = 'broker:29092',
-            'value.format' = 'debezium-avro-confluent',
-            'value.debezium-avro-confluent.url' = 'http://schema-registry:8082',
-            'properties.group.id'='media_types_consumer_v1',
-            'properties.max.message.bytes'='3000000',
-            'scan.startup.mode'='earliest-offset'
-        )
-    """
-    kafka_improves_ddl = """
-        CREATE TABLE improves (
-            `ImproveId` INT,
-            `StageLevel` TINYINT,
-            `StageText` VARCHAR,
-            `PartsImprovedList` VARCHAR,
-            PRIMARY KEY (ImproveId) NOT ENFORCED
-        ) WITH (
-            'connector' = 'kafka',
-            'topic' = 'Improves',
-            'properties.bootstrap.servers' = 'broker:29092',
-            'value.format' = 'debezium-avro-confluent',
-            'value.debezium-avro-confluent.url' = 'http://schema-registry:8082',
-            'properties.group.id'='customers_consumer_v1',
-            'properties.max.message.bytes'='3000000',
-            'scan.startup.mode'='earliest-offset'
-        )
-    """
-    kafka_full_vehicles_ddl = """
-        CREATE TABLE full_vehicles (
-            `vehicle_id` VARCHAR,
-            `km` INT,
-            `prev_owner_number` TINYINT,
-            `vehicle_order_id` VARCHAR,
-            `market_info_id` VARCHAR,
-            `media_type_id` INT,
-            `year_on_road` INT,
-            `test_date` DATE,
-            `improve_id` INT,
-            `air_bags` INT,
-            `sun_roof` TINYINT,
-            `magnesium_wheels` TINYINT,
-            `revers_sensors` TINYINT,
-            `abs` TINYINT,
-            `hybrid` TINYINT,
-            `doors` TINYINT,
-            `environment_friendly_level` INT,
-            `security_test_level` INT,
-            `manufacturer_id` INT,
-            `manufacturer_text` VARCHAR,
-            `model_id` INT,
-            `model_text` VARCHAR,
-            `submodel_id` INT,
-            `submodel_text` VARCHAR,
-            `year` INT,
-            `horse_power` INT,
-            `cruse_control` TINYINT,
-            `power_wheel` TINYINT,
-            `fully_autonomic` TINYINT,
-            `market_price` INT,
-            `available_disk_slot` INT,
-            `usb_slot_type` VARCHAR,
-            `usb_slots` INT,
-            `is_touch_display` INT,
-            `stage_level` TINYINT,
-            `stage_text` VARCHAR,
-            `parts_improved_list` VARCHAR,
-            PRIMARY KEY (vehicle_id) NOT ENFORCED
-        ) WITH (
-            'connector' = 'upsert-kafka',
-            'key.format' = 'raw',
-            'topic' = 'full_vehicles',
-            'properties.bootstrap.servers' = 'broker:29092',
-            'value.format' = 'avro-confluent',
-            'value.avro-confluent.url' = 'http://schema-registry:8082',
-            'sink.parallelism' = '1',
-            'properties.auto.register.schemas'= 'true',
-            'properties.use.latest.version'= 'true',
-            'properties.max.block.ms' = '600000',
-            'sink.buffer-flush.interval' = '100',
-            'sink.buffer-flush.max-rows' = '100'
-        )
-    """
-    env_settings = EnvironmentSettings.new_instance() \
-      .in_streaming_mode().build()
-    t_env = TableEnvironment.create(env_settings)
-    t_env.get_config().set('pipeline.jars',get_jars_full_path()) \
-    .set("parallelism.default", get_env('PARALLELISM', '1')) \
-    .set("table.display.max-column-width", '2000')
-
+    streaming_env = FlinkStreamingEnvironment('enrich_full_vehicle')
+    job_config = streaming_env.job_config
+    table_env = streaming_env.get_table_streaming_environment(parallelism=1)
+    vehicles_topic_connector = FlinkKafkaConnector(job_config.get('vehicles_topic'))
+    market_info_topic_connector = FlinkKafkaConnector(job_config.get('market_info_topic'))
+    media_types_topic_connector = FlinkKafkaConnector(job_config.get('media_types_topic'))
+    improves_topic_connector = FlinkKafkaConnector(job_config.get('improves_topic'))
+    full_vehicles_topic_connector = FlinkKafkaConnector(job_config.get('full_vehicles_topic'))
+    kafka_vehicles_ddl = vehicles_topic_connector.generate_kafka_connector('kafka')
+    kafka_market_info_ddl = market_info_topic_connector.generate_kafka_connector('kafka')
+    kafka_media_type_ddl = media_types_topic_connector.generate_kafka_connector('kafka')
+    kafka_improves_ddl = improves_topic_connector.generate_kafka_connector('kafka')
+    kafka_full_vehicles_ddl = full_vehicles_topic_connector.generate_kafka_connector('upsert-kafka')
 
     ddl_list = [
        kafka_vehicles_ddl, 
@@ -189,14 +24,13 @@ def log_processing():
        kafka_improves_ddl,
        kafka_full_vehicles_ddl
     ]
-
     for ddl in ddl_list:
-        t_env.execute_sql(ddl)
+        table_env.execute_sql(ddl)
 
-    vehicles_table = t_env.from_path('vehicles')
-    mark_info_table = t_env.from_path('market_info')
-    media_types_table = t_env.from_path('media_types')
-    improves_table = t_env.from_path('improves')
+    vehicles_table = table_env.from_path(vehicles_topic_connector.table_name)
+    mark_info_table = table_env.from_path(market_info_topic_connector.table_name)
+    media_types_table = table_env.from_path(media_types_topic_connector.table_name)
+    improves_table = table_env.from_path(improves_topic_connector.table_name)
 
     mark_info_table = mark_info_table \
     .rename_columns(F.col('MarketInfoId').alias('market_info_id_right'))
@@ -254,7 +88,7 @@ def log_processing():
         F.col('StageLevel').alias('stage_level'),
         F.col('StageText').alias('stage_text'),
         F.col('PartsImprovedList').alias('parts_improved_list')
-    ).execute_insert('full_vehicles').wait()
+    ).execute_insert(full_vehicles_topic_connector.table_name).wait()
     
 
 if __name__ == '__main__':
