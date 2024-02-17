@@ -34,7 +34,8 @@
         "process_list": [
             "aggregate_images",
             "enrich_full_order",
-            "enrich_full_vehicle"
+            "enrich_full_vehicle",
+            "full_ad_enrich"
         ],
         "process_command": [
             "./bin/flink",
