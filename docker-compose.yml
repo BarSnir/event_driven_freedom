@@ -116,6 +116,7 @@ services:
     command: > 
       bash -c "
       confluent-hub install --no-prompt debezium/debezium-connector-mysql:2.2.1 && \
+      confluent-hub install --no-prompt confluentinc/kafka-connect-elasticsearch:14.0.12 && \
       /etc/confluent/docker/run"
   control-center:
     image: confluentinc/cp-enterprise-control-center:7.5.3
@@ -162,8 +163,8 @@ services:
     platform: linux/arm64/v8
     attach: false
     restart: always
-    mem_limit: 6700m
-    mem_reservation: 6500m
+    mem_limit: 10500m
+    mem_reservation: 10000m
     cpus: 6
     build:
       context: ./images/pyflink
@@ -212,6 +213,7 @@ services:
       - SCRIPTS_PATH_DIR=/opt/flink/project/scripts
       - CONNECT_URL=http://kafka-connect:8083
       - KAFKA_SERVERS=broker:29092
+      - LOG_LEVEL=DEBUG
     volumes:
       - ./flink_process:/opt/flink/ops
       - ./jars:/opt/flink/opt
@@ -221,5 +223,29 @@ services:
         source: /var/run/docker.sock
         target: /var/run/docker.sock
     scale: 1
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.12.1
+    attach: false
+    container_name: elasticsearch
+    platform: linux/amd64
+    environment:
+      - xpack.security.enabled=false
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms2g -Xmx2g"
+    ports:
+      - 9200:9200
+      - 9300:9300
+    volumes:
+      - ./elasticsearch:/usr/share/elasticsearch/data
+  kibana:
+    container_name: kibana
+    attach: false
+    image: docker.elastic.co/kibana/kibana:8.12.1
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - 5601:5601
+    depends_on:
+      - elasticsearch
 volumes:
   my-db:

@@ -1,5 +1,6 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
+elasticsearch
 *.py[cod]
 *$py.class
 TODO
