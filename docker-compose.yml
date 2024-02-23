@@ -163,9 +163,6 @@ services:
     platform: linux/arm64/v8
     attach: false
     restart: always
-    mem_limit: 10500m
-    mem_reservation: 10000m
-    cpus: 6
     build:
       context: ./images/pyflink
       dockerfile: .Dockerfile
