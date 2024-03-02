@@ -1,4 +1,4 @@
-from pyflink.table import expressions as F 
+from pyflink.table import expressions as F, DataTypes
 from libs.connectors.kafka import FlinkKafkaConnector
 from libs.streaming import FlinkStreamingEnvironment
 
@@ -15,8 +15,19 @@ def log_processing():
     for ddl in ddl_list:
         table_env.execute_sql(ddl)
     full_ads_table = table_env.from_path(full_ads_topic_connector.table_name)
-    full_ads_table.filter(F.col('status_id') == 1) \
-    .execute_insert(search_documents_topic_connector.table_name).wait()
+    full_ads_table.filter(F.col('status_id') == 1)
+    full_ads_table.select(
+        F.col('order_id'),
+        F.row(
+            F.col('km'),
+            F.col('prev_owner_number').cast(DataTypes.INT()).alias('prev_owner_number'),
+            F.col('year_on_road'),
+            F.row(
+                F.col('sun_roof').cast(DataTypes.BOOLEAN()).alias('sun_roof'),
+                F.col('magnesium_wheels').cast(DataTypes.BOOLEAN()).alias('magnesium_wheels')
+            ).alias('peripheral_equipment')
+        ).alias('vehicle_specs')
+    ).execute_insert(search_documents_topic_connector.table_name).wait()
 
 if __name__ == '__main__':
     log_processing()
