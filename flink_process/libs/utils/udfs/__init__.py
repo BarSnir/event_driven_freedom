@@ -3,6 +3,7 @@ from datetime import date
 from pyflink.table.udf import udf
 from pyflink.table import DataTypes
 from libs.utils.udfs.maps import maps_helper
+from pyflink.table import expressions as F
 
 class FlinkUDFs:
 
@@ -123,3 +124,8 @@ class FlinkUDFs:
         status_dict = maps_helper.get('status_text')
         return status_dict.get(str(id))
     
+    @staticmethod 
+    @udf (result_type=DataTypes.ARRAY(DataTypes.STRING()))
+    def cast_to_array(value: str):
+        items_list = value.split(",")
+        return items_list

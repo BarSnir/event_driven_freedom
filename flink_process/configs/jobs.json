@@ -889,7 +889,8 @@
         "jars": [
             "flink-sql-connector-kafka-3.0.0-1.17.jar",
             "flink-sql-avro-1.17.1.jar",
-            "flink-sql-avro-confluent-registry-1.17.1.jar"
+            "flink-sql-avro-confluent-registry-1.17.1.jar",
+            "flink-python-1.17.1.jar"
         ],
         "full_ads_topic": {
             "table_name": "full_ads_topic",
@@ -943,7 +944,7 @@
                 "'properties.bootstrap.servers' = 'broker:29092',",
                 "'value.format' = 'avro-confluent',",
                 "'value.avro-confluent.url' = 'http://schema-registry:8082',",
-                "'properties.group.id'='full_ads_V8',",
+                "'properties.group.id'='full_ads_V10',",
                 "'properties.max.message.bytes'='3000000',",
                 "'scan.startup.mode'='earliest-offset'"
             ]
@@ -955,6 +956,7 @@
                 "`vehicle_specs`",
                 "ROW<`km` INT,`prev_owner_number` INT,`year_on_road` INT,",
                 "`peripheral_equipment` ROW<`sun_roof` BOOLEAN, `magnesium_wheels` BOOLEAN>> NOT NULL,",
+                "`images_urls` ARRAY<STRING>,",
                 "PRIMARY KEY (order_id) NOT ENFORCED"
             ],
             "connector_config": [

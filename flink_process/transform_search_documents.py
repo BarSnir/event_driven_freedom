@@ -1,6 +1,7 @@
 from pyflink.table import expressions as F, DataTypes
 from libs.connectors.kafka import FlinkKafkaConnector
 from libs.streaming import FlinkStreamingEnvironment
+from libs.utils.udfs import FlinkUDFs
 
 def log_processing():
     streaming_env = FlinkStreamingEnvironment('transform_search_documents')
@@ -26,7 +27,8 @@ def log_processing():
                 F.col('sun_roof').cast(DataTypes.BOOLEAN()).alias('sun_roof'),
                 F.col('magnesium_wheels').cast(DataTypes.BOOLEAN()).alias('magnesium_wheels')
             ).alias('peripheral_equipment')
-        ).alias('vehicle_specs')
+        ).alias('vehicle_specs'),
+        FlinkUDFs.cast_to_array(F.col('images_urls')).alias('images_urls')
     ).execute_insert(search_documents_topic_connector.table_name).wait()
 
 if __name__ == '__main__':
