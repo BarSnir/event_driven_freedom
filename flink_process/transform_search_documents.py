@@ -28,7 +28,9 @@ def log_processing():
                 F.col('magnesium_wheels').cast(DataTypes.BOOLEAN()).alias('magnesium_wheels')
             ).alias('peripheral_equipment')
         ).alias('vehicle_specs'),
-        FlinkUDFs.cast_to_array(F.col('images_urls')).alias('images_urls')
+        F.row(
+            FlinkUDFs.cast_to_array(F.col('images_urls')).alias('images_urls')
+        ).alias('meta_data')
     ).execute_insert(search_documents_topic_connector.table_name).wait()
 
 if __name__ == '__main__':

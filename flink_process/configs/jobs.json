@@ -956,7 +956,7 @@
                 "`vehicle_specs`",
                 "ROW<`km` INT,`prev_owner_number` INT,`year_on_road` INT,",
                 "`peripheral_equipment` ROW<`sun_roof` BOOLEAN, `magnesium_wheels` BOOLEAN>> NOT NULL,",
-                "`images_urls` ARRAY<STRING>,",
+                "meta_data ROW<`images_urls` ARRAY<STRING>>,",
                 "PRIMARY KEY (order_id) NOT ENFORCED"
             ],
             "connector_config": [
