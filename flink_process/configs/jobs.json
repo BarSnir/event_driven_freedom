@@ -944,7 +944,7 @@
                 "'properties.bootstrap.servers' = 'broker:29092',",
                 "'value.format' = 'avro-confluent',",
                 "'value.avro-confluent.url' = 'http://schema-registry:8082',",
-                "'properties.group.id'='full_ads_V10',",
+                "'properties.group.id'='full_ads_V4',",
                 "'properties.max.message.bytes'='3000000',",
                 "'scan.startup.mode'='earliest-offset'"
             ]
@@ -965,7 +965,7 @@
                 "ROW<`fully_autonomic` BOOLEAN,`power_wheel` BOOLEAN,`cruse_control` BOOLEAN,`sun_roof` BOOLEAN,",
                 "`magnesium_wheels` BOOLEAN,",
                 "`air_bags` INT, `revers_sensors` BOOLEAN, `abs` BOOLEAN, `hybrid` BOOLEAN,",
-                "`doors` INT, `environment_friendly_level` INT>,",
+                "`doors` INT, `environment_friendly_level` INT,`security_test_level` INT>,",
                 "`improvements`",
                 "ROW<`improve_id` INT, `parts_improved_list` VARCHAR, `stage_level` INT, `stage_text` VARCHAR>,",
                 "`media`",
