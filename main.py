@@ -10,10 +10,10 @@ from steps import (
 
 if __name__ == "__main__":
     logger = ColorLogger("event_driven_freedom").get_logger()
-    # setup_database.process(logger)
-    # process_batch_dataset.process(logger)
-    # process_debezium.process(logger)
-    # process_stream_enriches.process(logger)
+    setup_database.process(logger)
+    process_batch_dataset.process(logger)
+    process_debezium.process(logger)
+    process_stream_enriches.process(logger)
     process_search_documents.process(logger)
-    # process_elasticsearch_connector.process(logger)
+    process_elasticsearch_connector.process(logger)
     logger.info("Done, thank you for given freedom to your data!")
