@@ -1,0 +1,171 @@
+{
+  "index_patterns": [
+    "search_documents"
+  ],
+  "template": {
+    "settings": {
+        "number_of_replicas": 0,
+        "number_of_shards": 1
+    },
+    "mappings": {
+      "properties": {
+        "customer_details": {
+          "properties": {
+            "customer_id": {
+              "type": "long"
+            },
+            "full_name": {
+              "type": "keyword",
+              "ignore_above": 256
+            }
+          }
+        },
+        "market_price": {
+          "type": "long"
+        },
+        "meta_data": {
+          "properties": {
+            "images_count": {
+              "type": "long"
+            },
+            "images_urls": {
+              "type": "keyword",
+              "ignore_above": 256
+            },
+            "vehicle_id": {
+              "type": "keyword",
+              "ignore_above": 256
+            }
+          }
+        },
+        "order_id": {
+            "type": "keyword",
+            "ignore_above": 256
+        },
+        "price": {
+          "type": "long"
+        },
+        "site_token": {
+          "type": "keyword",
+          "ignore_above": 256
+        },
+        "status_id": {
+          "type": "long"
+        },
+        "vehicle_specs": {
+          "properties": {
+            "horse_power": {
+              "type": "long"
+            },
+            "improvements": {
+              "properties": {
+                "improve_id": {
+                  "type": "long"
+                },
+                "parts_improved_list": {
+                  "type": "keyword",
+                  "ignore_above": 256
+                },
+                "stage_level": {
+                  "type": "long"
+                },
+                "stage_text": {
+                  "type": "keyword",
+                    "ignore_above": 256
+                
+                }
+              }
+            },
+            "km": {
+              "type": "long"
+            },
+            "manufacturer_id": {
+              "type": "long"
+            },
+            "manufacturer_text": {
+              "type": "keyword",
+             "ignore_above": 256
+            },
+            "media": {
+              "properties": {
+                "available_disk_slot": {
+                  "type": "long"
+                },
+                "is_touch_display": {
+                  "type": "long"
+                },
+                "usb_slot_type": {
+                    "type": "keyword",
+                    "ignore_above": 256
+                },
+                "usb_slots": {
+                  "type": "long"
+                }
+              }
+            },
+            "model_id": {
+              "type": "long"
+            },
+            "model_text": {
+                "type": "keyword",
+                "ignore_above": 256
+            },
+            "peripheral_equipment": {
+              "properties": {
+                "abs": {
+                  "type": "boolean"
+                },
+                "air_bags": {
+                  "type": "long"
+                },
+                "cruse_control": {
+                  "type": "boolean"
+                },
+                "doors": {
+                  "type": "long"
+                },
+                "environment_friendly_level": {
+                  "type": "long"
+                },
+                "fully_autonomic": {
+                  "type": "boolean"
+                },
+                "hybrid": {
+                  "type": "boolean"
+                },
+                "magnesium_wheels": {
+                  "type": "boolean"
+                },
+                "power_wheel": {
+                  "type": "boolean"
+                },
+                "revers_sensors": {
+                  "type": "boolean"
+                },
+                "security_test_level": {
+                  "type": "long"
+                },
+                "sun_roof": {
+                  "type": "boolean"
+                }
+              }
+            },
+            "prev_owner_number": {
+              "type": "long"
+            },
+            "test_date": {
+              "type": "long"
+            },
+            "year": {
+              "type": "long"
+            },
+            "year_on_road": {
+              "type": "long"
+            }
+          }
+        }
+      }
+    }
+  }
+
+}

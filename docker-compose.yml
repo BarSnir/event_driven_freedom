@@ -210,6 +210,7 @@ services:
       - SCRIPTS_PATH_DIR=/opt/flink/project/scripts
       - CONNECT_URL=http://kafka-connect:8083
       - KAFKA_SERVERS=broker:29092
+      - ELASTICSEARCH_URL=elasticsearch:9200
       - LOG_LEVEL=DEBUG
     volumes:
       - ./flink_process:/opt/flink/ops

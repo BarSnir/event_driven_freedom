@@ -52,7 +52,7 @@ def log_processing():
             ).alias('peripheral_equipment'),
             F.row(
                 F.col('improve_id'),
-                F.col('parts_improved_list'),
+                FlinkUDFs.cast_to_array(F.col('parts_improved_list')).alias('parts_improved_list'),
                 F.col('stage_level').cast(DataTypes.INT()).alias('stage_level'),
                 F.col('stage_text')
             ).alias('improvements'),

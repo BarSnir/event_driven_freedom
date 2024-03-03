@@ -127,5 +127,7 @@ class FlinkUDFs:
     @staticmethod 
     @udf (result_type=DataTypes.ARRAY(DataTypes.STRING()))
     def cast_to_array(value: str):
+        if '[' in value:
+            value = value.replace('[','').replace(']','')
         items_list = value.split(",")
         return items_list

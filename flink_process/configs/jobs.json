@@ -967,7 +967,7 @@
                 "`air_bags` INT, `revers_sensors` BOOLEAN, `abs` BOOLEAN, `hybrid` BOOLEAN,",
                 "`doors` INT, `environment_friendly_level` INT,`security_test_level` INT>,",
                 "`improvements`",
-                "ROW<`improve_id` INT, `parts_improved_list` VARCHAR, `stage_level` INT, `stage_text` VARCHAR>,",
+                "ROW<`improve_id` INT, `parts_improved_list` ARRAY<STRING>, `stage_level` INT, `stage_text` VARCHAR>,",
                 "`media`",
                 "ROW<`available_disk_slot` INT, `usb_slot_type` VARCHAR, `usb_slots` INT, `is_touch_display` INT>> NOT NULL,",
                 "`customer_details`",
