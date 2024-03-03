@@ -16,7 +16,7 @@ def log_processing():
     for ddl in ddl_list:
         table_env.execute_sql(ddl)
     full_ads_table = table_env.from_path(full_ads_topic_connector.table_name)
-    full_ads_table.filter(F.col('status_id') == 1)
+    full_ads_table = full_ads_table.filter(F.col('status_id') == 1)
     full_ads_table.select(
         F.col('order_id'),
         F.col('site_token'),
