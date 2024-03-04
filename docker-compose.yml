@@ -233,7 +233,7 @@ services:
       - 9200:9200
       - 9300:9300
     volumes:
-      - ./elasticsearch:/usr/share/elasticsearch/data
+      - ./elasticsearch_vol:/usr/share/elasticsearch/data
   kibana:
     container_name: kibana
     attach: false
