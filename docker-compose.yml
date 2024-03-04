@@ -244,5 +244,14 @@ services:
       - 5601:5601
     depends_on:
       - elasticsearch
+  neo:
+      image: neo4j:latest
+      environment:
+        - NEO4J_AUTH=none
+      ports: 
+        - 7474:7474
+        - 7687:7687
+      volumes:
+        - neo4j_data:/data/
 volumes:
   my-db:
