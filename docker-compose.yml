@@ -151,6 +151,7 @@ services:
     restart: always
     volumes:
       - ./datasets:/opt/flink/datasets
+      - ./flink-checkpoints:/opt/flink/checkpoints
     environment:
       - |
         FLINK_PROPERTIES=
@@ -158,6 +159,15 @@ services:
         jobmanager.memory.process.size: 2500m
         jobstore.max-capacity: 8
         jobstore.type: file
+        state.checkpoint-storage: filesystem
+        state.checkpoints.dir: file:///opt/flink/checkpoints
+        state.checkpoints.num-retained: 3
+        execution.checkpointing.interval: 1000
+        execution.checkpointing.min-pause: 500
+        execution.checkpointing.tolerable-failed-checkpoints: 2 
+        execution.checkpointing.timeout: 60000
+        execution.checkpointing.unaligned.enabled: true
+        execution.checkpointing.externalized-checkpoint-retention: DELETE_ON_CANCELLATION
   taskmanager:
     container_name: taskmanager
     platform: linux/arm64/v8
@@ -216,6 +226,7 @@ services:
       - ./jars:/opt/flink/opt
       - ./datasets:/opt/flink/datasets
       - .:/opt/flink/project
+      - ./flink-checkpoints:/opt/flink/checkpoints
       - type: bind
         source: /var/run/docker.sock
         target: /var/run/docker.sock
