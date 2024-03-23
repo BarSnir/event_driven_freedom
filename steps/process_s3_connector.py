@@ -5,7 +5,7 @@ from libs.utils.logger import ColorLogger
 from libs.connectors.kafka_connect import KafkaConnectClient
 from libs.connectors.kafka_admin import KafkaAdminClientWrap
 
-MODULE_MESSAGE = 'Step F || Generating Elasticsearch sink connector'
+MODULE_MESSAGE = 'Step G || Generating Warehouse sink connector'
 FILE_PATH = '/opt/flink/project/configs/minio_sink.json'
 
 def process(logger):
