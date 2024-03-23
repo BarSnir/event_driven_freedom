@@ -21,6 +21,7 @@ The project is configured with checkpoints enabled, for jobs to recover from a t
 When a job is started, flink creates a subdir named after the jobId under `./flink-checkpoints`, and stores its last 3 checkpoints there.
 Once restarted after a failure, a job connector will start consuming kafka messages from the offset defined in the checkpoint is was recovered from, and not from the one specified in the job. (i.e. `earliest`)
 Refer to [flink checkpoints docs](https://nightlies.apache.org/flink/flink-docs-master/docs/dev/datastream/fault-tolerance/checkpointing/) to learn more.
+
 ### Exploring flink failure recovery
 1. Start the project `docker compose up`
 2. Checkout the checkpoints ui at http://localhost:8081/#/job/running -> pick a job -> *Checkpoints* -> *History*
@@ -30,3 +31,9 @@ Refer to [flink checkpoints docs](https://nightlies.apache.org/flink/flink-docs-
 ```console
 org.apache.flink.runtime.state.heap.HeapRestoreOperation     [] - Finished restoring from state handle: KeyGroupsStateHandle <checkpoint details>
 ```
+
+# Todo features:
+- Sink to Neo4j.
+- Sink to Postgres new tables.
+- Complex price drop mechanism.
+- Monitor all the stacks.
