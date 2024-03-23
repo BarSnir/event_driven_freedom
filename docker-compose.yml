@@ -222,7 +222,7 @@ services:
       - CONNECT_URL=http://kafka-connect:8083
       - KAFKA_SERVERS=broker:29092
       - ELASTICSEARCH_URL=elasticsearch:9200
-      - MINIO_HOST=http://minio:9000
+      - MINIO_HOST=minio:9000
       - MINIO_USER=bar
       - MINIO_PASSWORD=Strong#Pass#2022
       - SINK_BUCKET=raw-zone
