@@ -16,7 +16,7 @@ services:
     expose:
       - '3306'
     volumes:
-      - my-db:/var/lib/mysql
+      - my_db:/var/lib/mysql
   zookeeper:
     image: confluentinc/cp-zookeeper:7.5.3
     container_name: zookeeper
@@ -131,12 +131,13 @@ services:
       - "9021:9021"
     environment:
       CONTROL_CENTER_BOOTSTRAP_SERVERS: 'broker:29092'
-      CONTROL_CENTER_CONNECT_CONNECT-DEFAULT_CLUSTER: 'kafka-connect:8083'
+      CONTROL_CENTER_CONNECT_CONNECT-DEFAULT_CLUSTER: 'http://kafka-connect:8083'
       CONTROL_CENTER_SCHEMA_REGISTRY_URL: "http://schema-registry:8082"
       CONTROL_CENTER_REPLICATION_FACTOR: 1
       CONTROL_CENTER_INTERNAL_TOPICS_PARTITIONS: 1
       CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_PARTITIONS: 1
       CONFLUENT_METRICS_TOPIC_REPLICATION: 1
+      CONTROL_CENTER_CONNECT_HEALTHCHECK_ENDPOINT: '/connectors'
       PORT: 9021
   jobmanager:
     container_name: jobmanager
@@ -152,7 +153,7 @@ services:
     restart: always
     volumes:
       - ./datasets:/opt/flink/datasets
-      - ./flink-checkpoints:/opt/flink/checkpoints
+      - ./flink_checkpoints:/opt/flink/checkpoints
     environment:
       - |
         FLINK_PROPERTIES=
@@ -231,7 +232,7 @@ services:
       - ./jars:/opt/flink/opt
       - ./datasets:/opt/flink/datasets
       - .:/opt/flink/project
-      - ./flink-checkpoints:/opt/flink/checkpoints
+      - ./flink_checkpoints:/opt/flink/checkpoints
       - type: bind
         source: /var/run/docker.sock
         target: /var/run/docker.sock
@@ -261,6 +262,7 @@ services:
     depends_on:
       - elasticsearch
   minio:
+    container_name: minio
     image: minio/minio
     attach: false
     ports:
@@ -273,5 +275,7 @@ services:
       MINIO_ROOT_PASSWORD: Strong#Pass#2022
     command: server --console-address ":9001" /data
 volumes:
-  my-db:
+  my_db:
   minio_storage:
+  elasticsearch_vol:
+  flink_checkpoints:
