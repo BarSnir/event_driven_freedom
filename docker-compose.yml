@@ -276,6 +276,7 @@ services:
     command: server --console-address ":9001" /data
   neo:
       container_name: neo4j
+      attach: false
       image: neo4j:latest
       environment:
         - NEO4J_AUTH=none

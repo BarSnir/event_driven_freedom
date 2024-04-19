@@ -75,6 +75,8 @@ def log_processing():
         F.col('ModelText').alias('model_text'),
         F.col('SubModelId').alias('submodel_id'),
         F.col('SubModelText').alias('submodel_text'),
+        F.col('FamilyTypeId').alias('family_type_id'),
+        F.col('FamilyTypeText').alias('family_type_text'),
         F.col('Year').alias('year'),
         F.col('HorsePower').alias('horse_power'),
         F.col('CruseControl').alias('cruse_control'),

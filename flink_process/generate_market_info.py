@@ -41,7 +41,9 @@ def process():
         FlinkUDFs.get_mysql_boolean('Year_CruseControl', F.col('Year'), 'market_info_year').alias('CruseControl'),
         FlinkUDFs.get_mysql_boolean('Year_PowerWheel', F.col('Year'), 'market_info_year').alias('PowerWheel'),
         FlinkUDFs.get_mysql_boolean('Year_FullyAutonomic' ,F.col('Year'), 'market_info_year').alias('FullyAutonomic'),
-    ).execute_insert(sink_jdbc_connector.table_name).wait()
+        FlinkUDFs.get_int_range('family_type', 'market_info_ranges').alias('FamilyTypeId'),
+    ).add_columns(FlinkUDFs.get_family_type_text(F.col('FamilyTypeId')).alias('FamilyTypeText')) \
+    .execute_insert(sink_jdbc_connector.table_name).wait()
     market_info_csv_source.collect().close()
     market_info_jdbc_sink.collect().close()
 if __name__ == "__main__":

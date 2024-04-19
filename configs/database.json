@@ -33,6 +33,8 @@
                 "ModelText VARCHAR(255),",
                 "SubModelId INT,",
                 "SubModelText VARCHAR(255),",
+                "FamilyTypeId INT,",
+                "FamilyTypeText VARCHAR(255),",
                 "Year INT,",
                 "HorsePower INT,",
                 "CruseControl TINYINT(1),",

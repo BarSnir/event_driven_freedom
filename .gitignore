@@ -1,6 +1,7 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
 elasticsearch_vol
+flink_checkpoints
 *.py[cod]
 *$py.class
 TODO

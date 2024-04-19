@@ -43,6 +43,7 @@ maps_helper = {
         'security_test_level': {'low': 0, 'high': 11},
         'horse_power': {'low': 8*10, 'high': 45*10},
         'market_price': {'low': 1000*10, 'high': 45000*10},
+        'family_type': {'low': 1, 'high': 6},
     },
     'vehicles_ranges':{
         'km': {'low': 1000*10, 'high': 45000*10},
@@ -101,5 +102,13 @@ maps_helper = {
         '5': 'sold',
         '6': 'in_publish_queue',
         '7': 'deactivate'
+    },
+    "family_type_text":{
+        '1': 'mini',
+        '2': 'private',
+        '3': 'family',
+        '4': 'crossover',
+        '5': 'luxury',
+        '6': 'sport'
     }
 }

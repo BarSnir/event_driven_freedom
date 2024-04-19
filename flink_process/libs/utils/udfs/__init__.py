@@ -131,3 +131,9 @@ class FlinkUDFs:
             value = value.replace('[','').replace(']','')
         items_list = value.split(",")
         return items_list
+    
+    @staticmethod
+    @udf(result_type=DataTypes.STRING())
+    def get_family_type_text(id: str):
+        family_type_dict = maps_helper.get('family_type_text')
+        return family_type_dict.get(str(id))

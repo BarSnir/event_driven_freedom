@@ -30,6 +30,8 @@ def log_processing():
             F.col('model_text'),
             F.col('submodel_id'),
             F.col('submodel_text'),
+            F.col('family_type_id'),
+            F.col('family_type_text'),
             F.col('year'),
             F.col('km'),
             F.col('horse_power'),
