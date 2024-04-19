@@ -16,7 +16,7 @@ services:
     expose:
       - '3306'
     volumes:
-      - my-db:/var/lib/mysql
+      - my_db:/var/lib/mysql
   zookeeper:
     image: confluentinc/cp-zookeeper:7.5.3
     container_name: zookeeper
@@ -117,6 +117,7 @@ services:
       bash -c "
       confluent-hub install --no-prompt debezium/debezium-connector-mysql:2.2.1 && \
       confluent-hub install --no-prompt confluentinc/kafka-connect-elasticsearch:14.0.12 && \
+      confluent-hub install --no-prompt confluentinc/kafka-connect-s3:10.5.9 && \
       /etc/confluent/docker/run"
   control-center:
     image: confluentinc/cp-enterprise-control-center:7.5.3
@@ -130,12 +131,13 @@ services:
       - "9021:9021"
     environment:
       CONTROL_CENTER_BOOTSTRAP_SERVERS: 'broker:29092'
-      CONTROL_CENTER_CONNECT_CONNECT-DEFAULT_CLUSTER: 'kafka-connect:8083'
+      CONTROL_CENTER_CONNECT_CONNECT-DEFAULT_CLUSTER: 'http://kafka-connect:8083'
       CONTROL_CENTER_SCHEMA_REGISTRY_URL: "http://schema-registry:8082"
       CONTROL_CENTER_REPLICATION_FACTOR: 1
       CONTROL_CENTER_INTERNAL_TOPICS_PARTITIONS: 1
       CONTROL_CENTER_MONITORING_INTERCEPTOR_TOPIC_PARTITIONS: 1
       CONFLUENT_METRICS_TOPIC_REPLICATION: 1
+      CONTROL_CENTER_CONNECT_HEALTHCHECK_ENDPOINT: '/connectors'
       PORT: 9021
   jobmanager:
     container_name: jobmanager
@@ -151,6 +153,7 @@ services:
     restart: always
     volumes:
       - ./datasets:/opt/flink/datasets
+      - ./flink_checkpoints:/opt/flink/checkpoints
     environment:
       - |
         FLINK_PROPERTIES=
@@ -158,6 +161,15 @@ services:
         jobmanager.memory.process.size: 2500m
         jobstore.max-capacity: 8
         jobstore.type: file
+        state.checkpoint-storage: filesystem
+        state.checkpoints.dir: file:///opt/flink/checkpoints
+        state.checkpoints.num-retained: 3
+        execution.checkpointing.interval: 1000
+        execution.checkpointing.min-pause: 500
+        execution.checkpointing.tolerable-failed-checkpoints: 2 
+        execution.checkpointing.timeout: 60000
+        execution.checkpointing.unaligned.enabled: true
+        execution.checkpointing.externalized-checkpoint-retention: DELETE_ON_CANCELLATION
   taskmanager:
     container_name: taskmanager
     platform: linux/arm64/v8
@@ -211,11 +223,16 @@ services:
       - CONNECT_URL=http://kafka-connect:8083
       - KAFKA_SERVERS=broker:29092
       - ELASTICSEARCH_URL=elasticsearch:9200
+      - MINIO_HOST=minio:9000
+      - MINIO_USER=bar
+      - MINIO_PASSWORD=Strong#Pass#2022
+      - SINK_BUCKET=raw-zone
     volumes:
       - ./flink_process:/opt/flink/ops
       - ./jars:/opt/flink/opt
       - ./datasets:/opt/flink/datasets
       - .:/opt/flink/project
+      - ./flink_checkpoints:/opt/flink/checkpoints
       - type: bind
         source: /var/run/docker.sock
         target: /var/run/docker.sock
@@ -233,7 +250,7 @@ services:
       - 9200:9200
       - 9300:9300
     volumes:
-      - ./elasticsearch:/usr/share/elasticsearch/data
+      - ./elasticsearch_vol:/usr/share/elasticsearch/data
   kibana:
     container_name: kibana
     attach: false
@@ -244,7 +261,21 @@ services:
       - 5601:5601
     depends_on:
       - elasticsearch
+  minio:
+    container_name: minio
+    image: minio/minio
+    attach: false
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_storage:/data
+    environment:
+      MINIO_ROOT_USER: bar
+      MINIO_ROOT_PASSWORD: Strong#Pass#2022
+    command: server --console-address ":9001" /data
   neo:
+      container_name: neo4j
       image: neo4j:latest
       environment:
         - NEO4J_AUTH=none
@@ -254,4 +285,8 @@ services:
       volumes:
         - neo4j_data:/data/
 volumes:
-  my-db:
+  my_db:
+  minio_storage:
+  elasticsearch_vol:
+  flink_checkpoints:
+  neo4j_data:

@@ -41,7 +41,7 @@ def process(logger):
         logger.error("Timeout with process")
         logger.exception(timeout.strerror)
     except Exception as e:
-        logger.error("Something wired happened")
+        logger.error("Something weird happened")
         logger.exception(e)
     finally:
         logger.info("Restarting flink cluster...")
