@@ -6,7 +6,8 @@ from steps import (
     process_stream_enriches,
     process_search_documents,
     process_elasticsearch_connector,
-    process_s3_connector
+    process_s3_connector,
+    process_neo4j_connector
 )
 
 if __name__ == "__main__":
@@ -18,4 +19,5 @@ if __name__ == "__main__":
     process_search_documents.process(logger)
     process_elasticsearch_connector.process(logger)
     process_s3_connector.process(logger)
+    process_neo4j_connector.process(logger)
     logger.info("Done, thank you for given freedom to your data!")

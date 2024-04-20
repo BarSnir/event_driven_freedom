@@ -1,0 +1,17 @@
+{
+    "name": "recommendation_sink_connector_v1",
+    "config":{
+        "topics": "full_ads",
+        "connector.class": "streams.kafka.connect.sink.Neo4jSinkConnector",
+        "key.converter": "org.apache.kafka.connect.converters.ByteArrayConverter",
+        "value.converter": "io.confluent.connect.avro.AvroConverter",
+        "value.converter.schema.registry.url": "http://schema-registry:8082",
+        "errors.retry.timeout": "-1",
+        "errors.retry.delay.max.ms": "1000",
+        "errors.tolerance": "all",
+        "errors.log.enable": true,
+        "errors.log.include.messages": true,
+        "neo4j.server.uri": "bolt://neo4j:7687",
+        "neo4j.topic.cypher.full_ads": "MERGE (v:Vhicle{manufacturer: event.manufacturer_text, model: event.model_text, token: event.site_token, price:event.price, year:event.year}) MERGE (f:Family{family: event.family_type_text}) MERGE (v)-[:FAMILY_TYPE]->(f)"
+    }
+}
