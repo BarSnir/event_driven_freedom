@@ -15,6 +15,9 @@ https://drive.google.com/file/d/1xcJzDR0OytQTqq8ymZlrWXqOCxrBSMuW/view?usp=shari
 - Relevant Port for the project are:
     ```http://localhost:8081 - Apache Flink UI```.
     ```http://localhost:9021 - Confluent control center```.
+    ```http://localhost:5601 - Kibana```.
+    ```http://localhost:9000 - Minio Gui```.
+    ```http://localhost:7474 - Neo4j Database```.
 
 ## Failure recovery
 The project is configured with checkpoints enabled, for jobs to recover from a taskmanager failure.
@@ -33,7 +36,6 @@ org.apache.flink.runtime.state.heap.HeapRestoreOperation     [] - Finished resto
 ```
 
 # Todo features:
-- Sink to Neo4j.
 - Sink to Postgres new tables.
 - Complex price drop mechanism.
 - Monitor all the stacks.
