@@ -1002,5 +1002,100 @@
                 "'sink.buffer-flush.max-rows' = '1000'"
             ]
         }
+    },
+    "price_drop_a": {
+        "jars": [
+            "flink-sql-connector-kafka-3.0.0-1.17.jar",
+            "flink-sql-avro-1.17.1.jar",
+            "flink-sql-avro-confluent-registry-1.17.1.jar"
+        ],
+        "orders_topic": {
+            "table_name": "orders_topic",
+            "schema": [
+                "`before` ROW<`OrderId` VARCHAR, `Price` INT>,",
+                "`after` ROW<`OrderId` VARCHAR, `Price` INT>,",
+                "`op` VARCHAR"
+            ],
+            "connector_config": [
+                "'topic' = 'Orders',",
+                "'properties.bootstrap.servers' = 'broker:29092',",
+                "'value.format' = 'avro-confluent',",
+                "'value.avro-confluent.url' = 'http://schema-registry:8082',",
+                "'properties.group.id'='orders_price_drop_consumer_v1',",
+                "'properties.max.message.bytes'='3000000',",
+                "'scan.startup.mode'='earliest-offset'"
+            ]
+        },
+        "price_drop_topic": {
+            "table_name": "price_drop_topic",
+            "schema": [
+                "`order_id` VARCHAR,",
+                "`first_price` INT,",
+                "`last_price` INT,",
+                "`prev_price` INT,",
+                "`price_drop_percentage` INT,",
+                "PRIMARY KEY (order_id) NOT ENFORCED"
+            ],
+            "connector_config": [
+                "'key.format' = 'raw',",
+                "'topic' = 'price_drop',",
+                "'properties.bootstrap.servers' = 'broker:29092',",
+                "'value.format' = 'avro-confluent',",
+                "'value.avro-confluent.url' = 'http://schema-registry:8082',",
+                "'sink.parallelism' = '1',",
+                "'properties.auto.register.schemas'= 'true',",
+                "'properties.use.latest.version'= 'true',",
+                "'properties.max.block.ms' = '600000',",
+                "'sink.buffer-flush.interval' = '100',",
+                "'sink.buffer-flush.max-rows' = '100'"
+            ]
+        }
+    },
+    "price_drop_b": {
+        "jars": [
+            "flink-sql-connector-kafka-3.0.0-1.17.jar",
+            "flink-sql-avro-1.17.1.jar",
+            "flink-sql-avro-confluent-registry-1.17.1.jar"
+        ],
+        "price_drop_topic": {
+            "table_name": "price_drop_topic",
+            "schema": [
+                "`order_id` VARCHAR,",
+                "`price_drop_percentage` INT,",
+                "`ts` AS PROCTIME()"
+            ],
+            "connector_config": [
+                "'topic' = 'price_drop',",
+                "'properties.bootstrap.servers' = 'broker:29092',",
+                "'value.format' = 'avro-confluent',",
+                "'value.avro-confluent.url' = 'http://schema-registry:8082',",
+                "'properties.group.id'='price_drop_consumer_b_v5',",
+                "'scan.startup.mode'='earliest-offset'"
+            ]
+        },
+        "alerts_topic": {
+            "table_name": "price_drop_topic",
+            "schema": [
+                "`order_id` VARCHAR,",
+                "`first_price` INT,",
+                "`last_price` INT,",
+                "`prev_price` INT,",
+                "`price_drop_percentage` INT,",
+                "PRIMARY KEY (order_id) NOT ENFORCED"
+            ],
+            "connector_config": [
+                "'key.format' = 'raw',",
+                "'topic' = 'price_drop',",
+                "'properties.bootstrap.servers' = 'broker:29092',",
+                "'value.format' = 'avro-confluent',",
+                "'value.avro-confluent.url' = 'http://schema-registry:8082',",
+                "'sink.parallelism' = '1',",
+                "'properties.auto.register.schemas'= 'true',",
+                "'properties.use.latest.version'= 'true',",
+                "'properties.max.block.ms' = '600000',",
+                "'sink.buffer-flush.interval' = '100',",
+                "'sink.buffer-flush.max-rows' = '100'"
+            ]
+        }
     }
 }

@@ -36,7 +36,6 @@ org.apache.flink.runtime.state.heap.HeapRestoreOperation     [] - Finished resto
 ```
 
 # Todo features:
-- Sink to Postgres new tables.
 - Complex price drop mechanism.
 - Monitor all the stacks.
 - Draw.io update.

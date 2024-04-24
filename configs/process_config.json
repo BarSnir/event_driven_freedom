@@ -72,5 +72,26 @@
             "/opt/flink/ops",
             "--pyModule"
         ]
+    },
+    "stream_price_drop": {
+        "host": "jobmanager",
+        "port:": "8081",
+        "process_list": [
+            "price_drop_b"
+        ],
+        "process_command": [
+            "./bin/flink",
+            "run",
+            "--detached",
+            "--jobmanager",
+            "jobmanager:8081",
+            "-pyclientexec",
+            "/usr/bin/python",
+            "-pyexec",
+            "/usr/bin/python",
+            "--pyFiles",
+            "/opt/flink/ops",
+            "--pyModule"
+        ]
     }
 }
