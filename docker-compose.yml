@@ -228,7 +228,6 @@ services:
       - MINIO_USER=bar
       - MINIO_PASSWORD=Strong#Pass#2022
       - SINK_BUCKET=raw-zone
-      - LOG_LEVEL=DEBUG
     volumes:
       - ./flink_process:/opt/flink/ops
       - ./jars:/opt/flink/opt

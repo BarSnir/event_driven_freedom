@@ -1057,10 +1057,12 @@
             "flink-sql-avro-1.17.1.jar",
             "flink-sql-avro-confluent-registry-1.17.1.jar"
         ],
-        "price_drop_topic": {
-            "table_name": "price_drop_topic",
+        "price_drop_topic_source": {
+            "table_name": "price_drop_topic_source",
             "schema": [
                 "`order_id` VARCHAR,",
+                "`last_price` INT,",
+                "`prev_price` INT,",
                 "`price_drop_percentage` INT,",
                 "`ts` AS PROCTIME()"
             ],
@@ -1069,23 +1071,24 @@
                 "'properties.bootstrap.servers' = 'broker:29092',",
                 "'value.format' = 'avro-confluent',",
                 "'value.avro-confluent.url' = 'http://schema-registry:8082',",
-                "'properties.group.id'='price_drop_consumer_b_v5',",
-                "'scan.startup.mode'='earliest-offset'"
+                "'properties.group.id'='price_drop_consumer_b_v7',",
+                "'scan.startup.mode'='latest-offset'"
             ]
         },
-        "alerts_topic": {
-            "table_name": "price_drop_topic",
+        "price_drop_alert_topic": {
+            "table_name": "price_drop_alert_topic",
             "schema": [
                 "`order_id` VARCHAR,",
-                "`first_price` INT,",
                 "`last_price` INT,",
                 "`prev_price` INT,",
                 "`price_drop_percentage` INT,",
+                "`window_start` TIMESTAMP(3) NOT NULL,",
+                "`window_end` TIMESTAMP(3) NOT NULL,",
                 "PRIMARY KEY (order_id) NOT ENFORCED"
             ],
             "connector_config": [
                 "'key.format' = 'raw',",
-                "'topic' = 'price_drop',",
+                "'topic' = 'price_drop_alerts',",
                 "'properties.bootstrap.servers' = 'broker:29092',",
                 "'value.format' = 'avro-confluent',",
                 "'value.avro-confluent.url' = 'http://schema-registry:8082',",
