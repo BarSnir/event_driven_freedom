@@ -4,6 +4,11 @@ Project that demonstrate how to migrate single source of truth to event-driven p
 # Project Architecture
 https://drive.google.com/file/d/1xcJzDR0OytQTqq8ymZlrWXqOCxrBSMuW/view?usp=sharing
 
+# TODO
+- Lineage with Apache Atlas
+- Prometheus & Grafana integration & JMX
+- Flink side integration with Apache Atlas Rest
+
 # Usage:
 - Attention! 
     Please note that that project wrote on ARM processor,
