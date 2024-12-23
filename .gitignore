@@ -163,3 +163,4 @@ cython_debug/
 
 # flink checkpoints dir
 flink-checkpoints/
+elasticsearch/*

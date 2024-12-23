@@ -1,7 +1,8 @@
-mysql-connector-python==8.0.30
+mysql-connector-python==9.1.0
 python-dotenv==1.0.0
 colorlog==6.7.0
 apache-flink==1.17.2
-docker==7.0.0
+docker==7.1.0
 confluent-kafka==2.3.0
 minio==7.2.5
+requests==2.31.0 # https://stackoverflow.com/a/78508652/10589890

@@ -1,6 +1,6 @@
 import mysql.connector, os, json
 from logging import Logger
-from mysql.connector.cursor import CursorBase
+from mysql.connector.cursor import MySQLCursor
 class MySqlConnector:
 
     def __init__(self, logger: Logger):
@@ -16,7 +16,7 @@ class MySqlConnector:
             password=os.getenv('DB_PASSWORD')
         )
     
-    def _get_cursor(self)-> CursorBase:
+    def _get_cursor(self)-> MySQLCursor:
         return self._connector.cursor(buffered=True)
     
     def create_database(self)-> None:
